@@ -1,6 +1,9 @@
 package org.example;
 import jakarta.persistence.EntityManagerFactory;
+import javafx.concurrent.Task;
+import javafx.application.Platform;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -45,11 +48,42 @@ public class MyPod extends Application{
 
     @Override
     public void start(Stage primaryStage) {
-        // Initiera databasen och hämta data
-        initializeData();
+//        // Initiera databasen och hämta data
+//        initializeData();
 
-        //Huvudcontainer
-        BorderPane root = new BorderPane();
+    //Huvudcontainer
+    BorderPane root = new BorderPane();
+
+    // CodeRabbit Suggestion //
+    // Move Initialization to background thread //
+
+    // Initialize data in background
+    Task<Void> initTask = new Task<>() {
+
+    @Override
+    protected Void call() {
+        initializeData();
+        return null;
+            }};
+
+    initTask.setOnSucceeded(e -> {
+        // Refresh UI after data loads
+         if (isMainMenu) {
+             showMainMenu();}
+                    });
+
+    initTask.setOnFailed(e -> {
+            Platform.runLater(() -> {
+                  Label error = new Label("Failed to load data: " + initTask.getException().getMessage());
+                  error.setStyle("-fx-text-fill: red;");
+                  screenContent.getChildren().add(error);
+                  });
+                  });
+
+            new Thread(initTask).start();
+
+        // --------------------------------//
+
         root.setPadding(new Insets(20));
         root.getStyleClass().add("ipod-body");
 
