@@ -145,9 +145,9 @@ public class MyPod extends Application {
         menu.getStyleClass().add("wheel-text-menu");
         menu.setOnMouseClicked(e -> showMainMenu());
 
-        Label ff = new Label(">>"); ff.getStyleClass().add("wheel-text"); ff.setId("ff-button");
-        Label rew = new Label("<<"); rew.getStyleClass().add("wheel-text"); rew.setId("rew-button");
-        Label play = new Label(">"); play.getStyleClass().add("wheel-text-play");
+        Label ff = new Label("⏭"); ff.getStyleClass().add("wheel-text"); ff.setId("ff-button");
+        Label rew = new Label("⏮"); rew.getStyleClass().add("wheel-text"); rew.setId("rew-button");
+        Label play = new Label("▶"); play.getStyleClass().add("wheel-text-play");
 
         wheel.getChildren().addAll(outerWheel, centerButton, menu, ff, rew, play);
         return wheel;
