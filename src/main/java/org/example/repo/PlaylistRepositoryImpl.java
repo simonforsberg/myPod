@@ -32,19 +32,27 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
 
     @Override
     public void deletePlaylist(Playlist playlist) {
-        emf.runInTransaction(em -> em.remove(playlist));
-    }
+        emf.runInTransaction(em -> {
+            Playlist managed = em.merge(playlist);
+            em.remove(managed);
+            });
+        }
 
     @Override
     public void addSong(Playlist playlist, Song song) {
-        playlist.addSong(song);
-        emf.runInTransaction(em -> em.persist(playlist));
+        emf.runInTransaction(em -> {
+            Playlist managed = em.merge(playlist);
+            managed.addSong(song);
+        });
+
     }
 
     @Override
     public void removeSong(Playlist playlist, Song song) {
-        playlist.removeSong(song);
-        emf.runInTransaction(em -> em.remove(playlist));
+        emf.runInTransaction(em -> {
+            Playlist managed = em.merge(playlist);
+            managed.removeSong(song);
+            });
     }
 
     @Override
