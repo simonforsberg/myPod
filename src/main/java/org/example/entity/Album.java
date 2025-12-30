@@ -4,10 +4,18 @@ import jakarta.persistence.*;
 import org.example.ItunesDTO;
 import org.hibernate.proxy.HibernateProxy;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 public class Album {
@@ -23,6 +31,9 @@ public class Album {
     private int year;
 
     private Long trackCount;
+
+    @Lob
+    private byte[] cover;
 
 //    @OneToMany(mappedBy = "album")
     //private List<Song> song;
@@ -40,20 +51,34 @@ public class Album {
 
     protected Album (){}
 
-    public Album(Long albumId, String name, String genre, int year, Long trackCount, Artist artist) {
+    public Album(Long albumId, String name, String genre, int year, Long trackCount, Optional<BufferedImage> cover, Artist artist) {
         this.albumId = albumId;
         this.name = name;
         this.genre = genre;
         this.year = year;
         this.trackCount = trackCount;
         this.artist = artist;
+        if(cover.isPresent()){
+            //todo convert image to bytearray
+        }
+        else{
+            //todo default album cover
+        }
     }
 
     public static Album fromDTO(ItunesDTO dto, Artist artist) {
         if (dto.collectionId() == null || dto.collectionName() == null){
             throw new IllegalArgumentException("Required fields (albumId, albumName) cannot be null");
         }
-        return new Album(dto.collectionId(), dto.collectionName(), dto.primaryGenreName(), dto.releaseYear(), dto.trackCount(),artist);
+        Optional<BufferedImage> cover;
+        try {
+            cover = Optional.ofNullable(ImageIO.read(dto.artworkUrl100()));
+        } catch (IOException e) {
+            cover = Optional.empty();
+        }
+
+
+        return new Album(dto.collectionId(), dto.collectionName(), dto.primaryGenreName(), dto.releaseYear(), dto.trackCount(), cover,artist);
     }
 
     public Long getAlbumId() {

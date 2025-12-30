@@ -2,6 +2,7 @@ package org.example;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.net.URL;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,7 +16,8 @@ public record ItunesDTO(Long artistId,
                         String primaryGenreName,
                         LocalDate releaseDate,
                         Long trackCount,
-                        Long trackTimeMillis) {
+                        Long trackTimeMillis,
+                        URL artworkUrl100) {
 
     public int releaseYear() {
         return releaseDate != null ? releaseDate.getYear() : 0;
