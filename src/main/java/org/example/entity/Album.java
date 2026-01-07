@@ -161,6 +161,7 @@ public class Album {
      * @return image converted to byte array
      */
     public static byte[] imageToBytes(BufferedImage bi){
+        if (bi == null) return null;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         try {
             ImageIO.write(bi, "jpg", stream); //should always be jpg for this application
