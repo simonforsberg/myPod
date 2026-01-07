@@ -336,11 +336,23 @@ public class ItunesPlayList {
      */
     public static class DisplaySong {
         String name, artist, album, time;
+
         public DisplaySong(String n, String a, String al, Long t) {
             this.name = n;
             this.artist = a;
             this.album = al;
-            this.time = String.valueOf(t);
+            this.time = formatTime(t);
+        }
+
+        // Metod för att konvertera och skriva ut millisekunder som MM:SS
+        private String formatTime(Long millis) {
+            if (millis == null) return "0:00";
+
+            long seconds = millis / 1000;
+            long minutes = seconds / 60;
+            long remainingSeconds = seconds % 60;
+
+            return String.format("%d:%02d", minutes, remainingSeconds);
         }
     }
 }
