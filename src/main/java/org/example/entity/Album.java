@@ -9,10 +9,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.ImageProducer;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -133,6 +130,23 @@ public class Album {
         this.artist = artist;
     }
 
+    public byte[] getCover() {
+        return cover;
+    }
+
+    public Image getCoverImage() {
+        ByteArrayInputStream bais = new ByteArrayInputStream(getCover());
+        try {
+            return ImageIO.read(bais);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setCover(byte[] cover) {
+        this.cover = cover;
+    }
+
     /**
      * generate and returns byte array with cover art
      * @param url url pointing to desired cover
@@ -155,7 +169,7 @@ public class Album {
     /**
      * converts image to byte array to be stored as BLOB
      * @param bi buffered jpg image
-     * @return
+     * @return image converted to byte array
      */
     public static byte[] imageToBytes(BufferedImage bi){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -174,6 +188,8 @@ public class Album {
      * @return bufferedImage of desired cover or null if not available
      */
     public static BufferedImage loadUrlImage(URL url){
+        if(url == null) return null;
+
         BufferedImage bi;
         try {
             bi = ImageIO.read(url);
