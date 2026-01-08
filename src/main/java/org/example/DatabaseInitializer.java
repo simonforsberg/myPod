@@ -2,10 +2,9 @@ package org.example;
 
 import org.example.entity.Album;
 import org.example.entity.Artist;
+import org.example.entity.Playlist;
 import org.example.entity.Song;
-import org.example.repo.AlbumRepository;
-import org.example.repo.ArtistRepository;
-import org.example.repo.SongRepository;
+import org.example.repo.*;
 
 import java.util.List;
 
@@ -16,6 +15,7 @@ public class DatabaseInitializer {
     private final SongRepository songRepo;
     private final AlbumRepository albumRepo;
     private final ArtistRepository artistRepo;
+    private final PlaylistRepository pri = new PlaylistRepositoryImpl();
 
     public DatabaseInitializer(ItunesApiClient apiClient, SongRepository songRepo , AlbumRepository albumRepo, ArtistRepository artistRepo) {
         this.apiClient = apiClient;
@@ -62,6 +62,18 @@ public class DatabaseInitializer {
             } catch (Exception e) {
                 throw new RuntimeException("Failed to fetch or persist data for search term: " + term, e);
             }
+        }
+
+        if(!pri.existsByUniqueId(1L)) { // Finns det en playlist borde det vara "Bibliotek"
+            Playlist pl1 = pri.createPlaylist("Bibliotek");
+            for(Song s : songRepo.findAll()) {
+                pl1.addSong(s);
+            }
+            pri.save(pl1);
+            //Lägger bara till låtar som fanns innan listan, om fler "laddas ner" behövs de manuellt läggas till
+        }
+        if(!pri.existsByUniqueId(2L)) { // Finns det två playlist borde den andra vara "Favoriter"
+            pri.createPlaylist("Favoriter");
         }
     }
 }

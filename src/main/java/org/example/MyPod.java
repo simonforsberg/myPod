@@ -20,6 +20,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import org.example.entity.Album;
 import org.example.entity.Artist;
+import org.example.entity.Playlist;
 import org.example.entity.Song;
 import org.example.repo.*;
 
@@ -37,12 +38,14 @@ public class MyPod extends Application {
     private final SongRepository songRepo = new SongRepositoryImpl();
     private final ArtistRepository artistRepo = new ArtistRepositoryImpl();
     private final AlbumRepository albumRepo = new AlbumRepositoryImpl();
+    private final PlaylistRepository playlistRepo = new PlaylistRepositoryImpl();
     private final ItunesApiClient apiClient = new ItunesApiClient();
 
     // Listor som håller datan vi hämtat från databasen
     private List<Song> songs;
     private List<Artist> artists;
     private List<Album> albums;
+    private List<Playlist> playlists;
 
     // --- MENY-DATA ---
     // Huvudmenyns alternativ. "ObservableList" är en speciell lista i JavaFX
@@ -351,7 +354,7 @@ public class MyPod extends Application {
      */
     private void openMusicPlayer() {
         ItunesPlayList itunesPlayList = new ItunesPlayList();
-        itunesPlayList.showLibrary(this.songs);
+        itunesPlayList.showLibrary(this.songs, this.playlists);
     }
 
     /**
@@ -368,6 +371,7 @@ public class MyPod extends Application {
             this.songs = songRepo.findAll();
             this.artists = artistRepo.findAll();
             this.albums = albumRepo.findAll();
+            this.playlists = playlistRepo.findAll();
         } catch (Exception e) {
             System.err.println("Kunde inte ladda data: " + e.getMessage());
         }

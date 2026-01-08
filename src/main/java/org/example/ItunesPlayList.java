@@ -1,9 +1,9 @@
 package org.example;
 
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,19 +13,30 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.example.entity.Playlist;
+import org.example.entity.Song;
+import org.example.repo.PlaylistRepository;
+import org.example.repo.PlaylistRepositoryImpl;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Huvudklass för GUI:t. Hanterar visning av bibliotek, spellistor och sökning.
  */
 public class ItunesPlayList {
 
+    PlaylistRepository pri = new PlaylistRepositoryImpl();
+
     // --- DATAMODELLER ---
 
     // En Map som lagrar alla spellistor. Nyckeln är namnet (t.ex. "Musik") och värdet är listan med låtar.
     private Map<String, ObservableList<DisplaySong>> allPlaylists = new HashMap<>();
+
+    // En lista med alla playlist som finns i databasen
+    private ObservableList<Playlist> allPlaylistList = FXCollections.observableArrayList();
 
     // Listan med namn på spellistor som visas i vänstermenyn (Sidebar).
     // "ObservableList" gör att GUI:t uppdateras automatiskt om vi lägger till/tar bort namn här.
@@ -37,7 +48,7 @@ public class ItunesPlayList {
     private TableView<DisplaySong> songTable = new TableView<>();
 
     // Listan till vänster där man väljer spellista
-    private ListView<String> sourceList = new ListView<>();
+    private ListView<Playlist> sourceList = new ListView<>();
 
     // Textfält för den "digitala displayen" högst upp
     private Text lcdTitle = new Text("myTunes");
@@ -47,11 +58,11 @@ public class ItunesPlayList {
      * Bygger upp hela gränssnittet och visar fönstret.
      * @param dbSongs En lista med låtar hämtade från databasen/backend.
      */
-    public void showLibrary(List<org.example.entity.Song> dbSongs) {
+    public void showLibrary(List<Song> dbSongs, List<Playlist> dbPlaylists) {
         Stage stage = new Stage();
 
         // Konvertera databas-objekten till vår interna DisplaySong-klass och skapa grundlistorna
-        initData(dbSongs);
+        initData(dbSongs, dbPlaylists);
 
         // BorderPane är huvudlayouten: Top, Left, Center, Bottom
         BorderPane root = new BorderPane();
@@ -86,9 +97,22 @@ public class ItunesPlayList {
         // ---------------------------------------------------------
         // 2. VÄNSTER (Spellistorna)
         // ---------------------------------------------------------
-        sourceList.setItems(playlistNames); // Koppla data till listan
+
+        sourceList.setItems(allPlaylistList); // Koppla data till listan
         sourceList.getStyleClass().add("source-list");
         sourceList.setPrefWidth(200);
+
+        sourceList.setCellFactory(sl -> new ListCell<>(){
+            @Override
+            protected void updateItem(Playlist playlist, boolean empty) {
+                super.updateItem(playlist, empty);
+                if (empty || playlist == null) {
+                    setText(null);
+                } else {
+                    setText(playlist.getName());
+                }
+            }
+        });
 
         // Lyssnare: Vad händer när man klickar på en spellista i menyn?
         sourceList.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
@@ -212,7 +236,7 @@ public class ItunesPlayList {
      * Filtrerar låtarna i den aktiva listan baserat på söktexten.
      */
     private void filterSongs(String searchText) {
-        String currentList = sourceList.getSelectionModel().getSelectedItem();
+        String currentList = sourceList.getSelectionModel().getSelectedItem().getName();
         if (currentList == null) return;
 
         // Hämta originaldatan för den valda spellistan
@@ -239,28 +263,33 @@ public class ItunesPlayList {
     /**
      * Omvandlar databas-objekten till GUI-objekt och skapar standardlistor.
      */
-    private void initData(List<org.example.entity.Song> dbSongs) {
-        ObservableList<DisplaySong> library = FXCollections.observableArrayList();
+    private void initData(List <Song> dbSongs, List<Playlist> dbPlaylists) {
+        allPlaylistList = FXCollections.observableArrayList(dbPlaylists);
 
+        for(Playlist p : allPlaylistList){
+            playlistNames.add(p.getName());
+        }
+
+        ObservableList<DisplaySong> library = FXCollections.observableArrayList();
         // Loopa igenom datan från databasen
-        if (dbSongs != null) {
-            for (org.example.entity.Song s : dbSongs) {
+        if (dbPlaylists != null) {
+            for (Song s: dbSongs) {
                 // Hantera null-värden snyggt (om artist eller album saknas)
                 String art = (s.getAlbum() != null && s.getAlbum().getArtist() != null) ? s.getAlbum().getArtist().getName() : "Okänd";
                 String alb = (s.getAlbum() != null) ? s.getAlbum().getName() : "Okänt";
 
                 // Skapa ett nytt DisplaySong-objekt
-                library.add(new DisplaySong(s.getTitle(), art, alb, s.getLength()));
+                library.add(new DisplaySong(s.getTitle(), art, alb, s.getFormattedLength()));
             }
         }
 
-        // Lägg in huvudbiblioteket "Musik"
-        allPlaylists.put("Musik", library);
-        playlistNames.add("Musik");
-
-        // Skapa en tom lista för "Favoriter"
-        allPlaylists.put("Favoriter", FXCollections.observableArrayList());
-        playlistNames.add("Favoriter");
+//        // Lägg in huvudbiblioteket "Musik"
+//        allPlaylists.put("Bibliotek", library);
+//        playlistNames.add("Bibliotek");
+//
+//        // Skapa en tom lista för "Favoriter"
+//        allPlaylists.put("Favoriter", FXCollections.observableArrayList());
+//        playlistNames.add("Favoriter");
     }
 
     /**
@@ -270,38 +299,46 @@ public class ItunesPlayList {
         TextInputDialog d = new TextInputDialog("Ny lista");
 
         // Här ändrar du fönstrets titel och text
-        d.setTitle("Skapa ny spellista");        // Ersätter "Bekräftelse"
-        d.setHeaderText("Ange namn på din nya lista"); // Rubriken inuti rutan
-        d.setContentText("Namn:");               // Texten bredvid inmatningsfältet
+        d.setTitle("Skapa ny spellista");               // Ersätter "Bekräftelse"
+        d.setHeaderText("Ange namn på din nya lista");  // Rubriken inuti rutan
+        d.setContentText("Namn:");                      // Texten bredvid inmatningsfältet
 
         d.showAndWait().ifPresent(name -> {
             // Kontrollera att namnet inte är tomt och inte redan finns
             if (!name.trim().isEmpty() && !allPlaylists.containsKey(name)) {
+                Playlist pl = pri.createPlaylist(name);
+                allPlaylistList.add(pl);
                 allPlaylists.put(name, FXCollections.observableArrayList());
                 playlistNames.add(name);
             }
         });
     }
 
+    // TODO, Metod för att byta namn på spellista?
+    // /**
+    //  * Ändra namn på vald spellista (men tillåter inte att man ändrar "Bibliotek"). ??
+    //  */
+    // private void renameSelectedPlaylist() {}
+
     /**
-     * Tar bort vald spellista (men tillåter inte att man tar bort "Musik").
+     * Tar bort vald spellista (men tillåter inte att man tar bort "Bibliotek").
      */
     private void deleteSelectedPlaylist() {
-        String sel = sourceList.getSelectionModel().getSelectedItem();
-        if (sel != null && !sel.equals("Musik")) {
+        String sel = sourceList.getSelectionModel().getSelectedItem().getName();
+        if (sel != null && !sel.equals("Bibliotek")) {
             allPlaylists.remove(sel);
             playlistNames.remove(sel);
         }
     }
 
     /**
-     * Tar bort vald låt från den aktiva spellistan (ej från huvudbiblioteket "Musik").
+     * Tar bort vald låt från den aktiva spellistan (ej från huvudbiblioteket "Bibliotek").
      */
     private void removeSelectedSong() {
         DisplaySong sel = songTable.getSelectionModel().getSelectedItem();
-        String list = sourceList.getSelectionModel().getSelectedItem();
+        String list = sourceList.getSelectionModel().getSelectedItem().getName();
         // Skydd: Man får inte ta bort låtar direkt från "Musik"-biblioteket i denna vy
-        if (sel != null && list != null && !list.equals("Musik")) {
+        if (sel != null && list != null && !list.equals("Bibliotek")) {
             allPlaylists.get(list).remove(sel);
         }
     }
@@ -315,7 +352,7 @@ public class ItunesPlayList {
 
         ContextMenu menu = new ContextMenu();
         for (String n : playlistNames) {
-            if (n.equals("Musik")) continue; // Man kan inte lägga till i "Musik" (det är källan)
+            if (n.equals("Bibliotek")) continue; // Man kan inte lägga till i "Musik" (det är källan)
 
             MenuItem itm = new MenuItem(n);
             itm.setOnAction(e -> {
@@ -337,22 +374,11 @@ public class ItunesPlayList {
     public static class DisplaySong {
         String name, artist, album, time;
 
-        public DisplaySong(String n, String a, String al, Long t) {
+        public DisplaySong(String n, String a, String al, String formattedTime) {
             this.name = n;
             this.artist = a;
             this.album = al;
-            this.time = formatTime(t);
-        }
-
-        // Konvertera millisekunder till mm:ss
-        private String formatTime(Long millis) {
-            if (millis == null || millis < 0) return "0:00";
-
-            long seconds = millis / 1000;
-            long minutes = seconds / 60;
-            long remainingSeconds = seconds % 60;
-
-            return String.format("%d:%02d", minutes, remainingSeconds);
+            this.time = formattedTime;
         }
     }
 }

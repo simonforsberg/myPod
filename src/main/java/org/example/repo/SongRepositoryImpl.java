@@ -13,7 +13,6 @@ public class SongRepositoryImpl implements SongRepository {
 
     private final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
 
-
     @Override
     public Long count() {
         try (var em = emf.createEntityManager()) {
@@ -30,7 +29,6 @@ public class SongRepositoryImpl implements SongRepository {
                 .getSingleResult() > 0;
         }
     }
-
 
     @Override
     public void save(Song song) {
@@ -62,7 +60,6 @@ public class SongRepositoryImpl implements SongRepository {
                 .setParameter("artist", artist)
                 .getResultList());
     }
-
 
     @Override
     public List<Song> findByAlbum(Album album) {

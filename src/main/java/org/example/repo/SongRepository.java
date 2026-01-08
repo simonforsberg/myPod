@@ -21,5 +21,4 @@ public interface SongRepository {
     List<Song> findByAlbum(Album album);
 
     List<Song> findByGenre(String genre);
-
 }
