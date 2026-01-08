@@ -28,7 +28,7 @@ public class ItunesApiClient {
     public List<ItunesDTO> searchSongs(String term) throws Exception {
 
         String encodedTerm = URLEncoder.encode(term, StandardCharsets.UTF_8);
-        String url = "https://itunes.apple.com/search?term=" + encodedTerm + "&entity=song&attribute=artistTerm&limit=8";
+        String url = "https://itunes.apple.com/search?term=" + encodedTerm + "&entity=song&attribute=artistTerm&limit=20";
 
         HttpRequest request = HttpRequest.newBuilder()
             .GET()
@@ -51,13 +51,25 @@ public class ItunesApiClient {
             return List.of();
         }
 
+        String normalizedTerm = normalize(term);
+
         List<ItunesDTO> songs = new ArrayList<>();
         for (JsonNode node : results) {
             ItunesDTO song = mapper.treeToValue(node, ItunesDTO.class);
-            songs.add(song);
+
+            String normalizedArtist = normalize(song.artistName());
+
+            if(normalizedTerm.equals(normalizedArtist)) {
+                songs.add(song);
+            }
         }
 
         return songs;
+    }
+    public String normalize (String s){
+        return s.toLowerCase()
+            .replaceAll("[+\\s]+", " ")
+            .trim();
     }
 }
 
