@@ -52,7 +52,7 @@ public class ItunesPlayList {
         Stage stage = new Stage();
 
         // Lägg till existerande playlist i vår lokala lista
-        allPlaylistList.addAll(dbPlaylists);
+        allPlaylistList.setAll(dbPlaylists);
 
         // BorderPane är huvudlayouten: Top, Left, Center, Bottom
         BorderPane root = new BorderPane();
@@ -324,7 +324,7 @@ public class ItunesPlayList {
         d.showAndWait().ifPresent(newName -> {
             if (!newName.trim().isEmpty()) {
                 pri.renamePlaylist(sel, newName);
-                //behöver vi uppdatera den lokala listan av playlist?
+                sourceList.refresh();
             }
         });
     }
@@ -350,6 +350,7 @@ public class ItunesPlayList {
         if (sel != null && list != null && list.getPlaylistId() != 1L) {
             pri.removeSong(list, sel);
             //pri.save(list);
+            songTable.getItems().remove(sel);
         }
     }
 

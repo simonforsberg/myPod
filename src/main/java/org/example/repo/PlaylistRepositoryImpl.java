@@ -7,6 +7,7 @@ import org.example.entity.Playlist;
 import org.example.entity.Song;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class PlaylistRepositoryImpl implements PlaylistRepository {
@@ -71,10 +72,17 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
 
     @Override
     public boolean isSongInPlaylist(Playlist playlist, Song song) {
-        return emf.callInTransaction(em -> {
-            Playlist managed = em.merge(playlist);
-            return managed.getSongs().contains(song);
-        });
+        try (var em = emf.createEntityManager()) {
+            return em.createQuery(
+                "SELECT count(s) FROM Playlist p " +
+                    "LEFT JOIN FETCH p.songs s" +
+                    "WHERE p.playlistId = :pid" +
+                    "AND s.songId = :sid",
+                    Long.class)
+                .setParameter("pid", playlist.getPlaylistId())
+                .setParameter("sid", song.getSongId())
+                .getSingleResult() > 0;
+        }
     }
 
     @Override
