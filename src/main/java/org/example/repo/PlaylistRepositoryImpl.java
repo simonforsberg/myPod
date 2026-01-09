@@ -13,7 +13,6 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
 
     private final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
 
-
     @Override
     public void save(Playlist p) {
         if (p.getPlaylistId() == null) {
@@ -22,14 +21,26 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
         } else {
             emf.runInTransaction(em -> em.merge(p)); // uppdatering
         }
-
     }
+
+//    @Override
+//    public List<Playlist> findAll() {
+//        return emf.callInTransaction(em ->
+//            em.createQuery("select pl from Playlist pl", Playlist.class)
+//                .getResultList());
+//    }
 
     @Override
     public List<Playlist> findAll() {
-        return emf.callInTransaction(em ->
-            em.createQuery("select pl from Playlist pl", Playlist.class)
-                .getResultList());
+        try (var em = emf.createEntityManager()) {
+            return em.createQuery(
+                "SELECT DISTINCT p FROM Playlist p " +
+                    "LEFT JOIN FETCH p.songs s " +
+                    "LEFT JOIN FETCH s.album a " +
+                    "LEFT JOIN FETCH a.artist",
+                Playlist.class
+            ).getResultList();
+        }
     }
 
     @Override
@@ -41,12 +52,29 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
         }
     }
 
+//    @Override
+//    public Playlist findById(Long id) {
+//        return emf.callInTransaction(em ->
+//            em.createQuery("select pl from Playlist pl where pl.id = :playlistId", Playlist.class)
+//                .setParameter("playlistId", id)
+//                .getSingleResult());
+//    }
+
+
     @Override
     public Playlist findById(Long id) {
-        return emf.callInTransaction(em ->
-            em.createQuery("select pl from Playlist pl where pl.id = :playlistId", Playlist.class)
-                .setParameter("playlistId", id)
-                .getSingleResult());
+        try (var em = emf.createEntityManager()) {
+            return em.createQuery(
+                    "SELECT p FROM Playlist p " +
+                        "LEFT JOIN FETCH p.songs s " +
+                        "LEFT JOIN FETCH s.album a " +
+                        "LEFT JOIN FETCH a.artist " +
+                        "WHERE p.playlistId = :id",
+                    Playlist.class
+                )
+                .setParameter("id", id)
+                .getSingleResult();
+        }
     }
 
     @Override
@@ -79,7 +107,6 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
             Playlist managed = em.merge(playlist);
             managed.addSong(song);
         });
-
     }
 
     @Override

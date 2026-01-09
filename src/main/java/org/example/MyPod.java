@@ -354,7 +354,7 @@ public class MyPod extends Application {
      */
     private void openMusicPlayer() {
         ItunesPlayList itunesPlayList = new ItunesPlayList();
-        itunesPlayList.showLibrary(this.songs, this.playlists);
+        itunesPlayList.showLibrary(this.playlists);
     }
 
     /**
