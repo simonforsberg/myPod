@@ -31,12 +31,6 @@ public class Album {
     @Lob
     private byte[] cover;
 
-//    @OneToMany(mappedBy = "album")
-    //private List<Song> song;
-
-   // @ManyToOne(cascade = CascadeType.PERSIST)
-   // @JoinColumn(name="artist_id")
- //   private Artist artist;
 
     @ManyToOne
     @JoinColumn(name = "artist_id")
