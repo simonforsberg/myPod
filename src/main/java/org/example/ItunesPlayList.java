@@ -350,6 +350,7 @@ public class ItunesPlayList {
         if (sel != null && list != null && list.getPlaylistId() != 1L) {
             pri.removeSong(list, sel);
             //pri.save(list);
+            list.getSongs().remove(sel);
             songTable.getItems().remove(sel);
         }
     }
@@ -370,6 +371,7 @@ public class ItunesPlayList {
                 // Om låten inte redan finns i listan, lägg till den
                 if (!pri.isSongInPlaylist(pl, sel)) {
                     pri.addSong(pl, sel);
+                    pl.getSongs().add(sel);
                     //pl.addSong(sel);
                     //pri.save(pl);
                 }

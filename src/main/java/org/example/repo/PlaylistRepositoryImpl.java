@@ -73,15 +73,8 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
     @Override
     public boolean isSongInPlaylist(Playlist playlist, Song song) {
         try (var em = emf.createEntityManager()) {
-            return em.createQuery(
-                "SELECT count(s) FROM Playlist p " +
-                    "LEFT JOIN FETCH p.songs s" +
-                    "WHERE p.playlistId = :pid" +
-                    "AND s.songId = :sid",
-                    Long.class)
-                .setParameter("pid", playlist.getPlaylistId())
-                .setParameter("sid", song.getSongId())
-                .getSingleResult() > 0;
+            Playlist managed = em.find(Playlist.class, playlist.getPlaylistId());
+            return managed.getSongs().contains(song);
         }
     }
 
@@ -103,16 +96,26 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
     @Override
     public void addSong(Playlist playlist, Song song) {
         emf.runInTransaction(em -> {
-            Playlist managed = em.merge(playlist);
-            managed.addSong(song);
+            Playlist managedPlaylist =
+                em.find(Playlist.class, playlist.getPlaylistId());
+
+            Song managedSong =
+                em.find(Song.class, song.getSongId());
+
+            managedPlaylist.addSong(managedSong);
         });
     }
 
     @Override
     public void removeSong(Playlist playlist, Song song) {
         emf.runInTransaction(em -> {
-            Playlist managed = em.merge(playlist);
-            managed.removeSong(song);
+            Playlist managedPlaylist =
+                em.find(Playlist.class, playlist.getPlaylistId());
+
+            Song managedSong =
+                em.find(Song.class, song.getSongId());
+
+            managedPlaylist.getSongs().remove(managedSong);
         });
     }
 
