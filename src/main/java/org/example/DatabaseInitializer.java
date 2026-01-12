@@ -65,11 +65,8 @@ public class DatabaseInitializer {
         }
 
         if (!playlistRepo.existsByUniqueId(1L)) { // Finns det en playlist borde det vara "Bibliotek"
-            Playlist pl1 = playlistRepo.createPlaylist("Bibliotek");
-            for (Song s : songRepo.findAll()) {
-                pl1.addSong(s);
-            }
-            playlistRepo.save(pl1);
+            Playlist library = playlistRepo.createPlaylist("Bibliotek");
+            playlistRepo.addSongs(library, songRepo.findAll());
             //Lägger bara till låtar som fanns innan listan, om fler "laddas ner" behövs de manuellt läggas till
         }
         if (!playlistRepo.existsByUniqueId(2L)) { // Finns det två playlist borde den andra vara "Favoriter"

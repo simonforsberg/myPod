@@ -8,6 +8,7 @@ import org.example.PersistenceManager;
 import org.example.entity.Playlist;
 import org.example.entity.Song;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -18,20 +19,6 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
 
     public PlaylistRepositoryImpl(EntityManagerFactory emf) {
         this.emf = emf;
-    }
-
-    @Override
-    public void save(Playlist p) {
-        if (p == null) {
-            throw new IllegalArgumentException("Playlist cannot be null");
-        }
-
-        if (p.getPlaylistId() == null) {
-            emf.runInTransaction(em -> em.persist(p));
-
-        } else {
-            emf.runInTransaction(em -> em.merge(p));
-        }
     }
 
     @Override
@@ -145,6 +132,28 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
                 throw new IllegalStateException("Song not found with id: " + song.getSongId());
             }
             managedPlaylist.addSong(managedSong);
+        });
+    }
+
+    @Override
+    public void addSongs(Playlist playlist, Collection<Song> songs) {
+        if (playlist == null || songs == null) {
+            throw new IllegalArgumentException("Playlist and songs cannot be null");
+        }
+        emf.runInTransaction(em -> {
+            Playlist managedPlaylist =
+                em.find(Playlist.class, playlist.getPlaylistId());
+            if (managedPlaylist == null) {
+                throw new IllegalStateException("Playlist not found with id: " + playlist.getPlaylistId());
+            }
+            for(Song s : songs) {
+                Song managedSong =
+                    em.find(Song.class, s.getSongId());
+                if (managedSong == null) {
+                    throw new IllegalStateException("Song not found with id: " + s.getSongId());
+                }
+                managedPlaylist.addSong(managedSong);
+            }
         });
     }
 
