@@ -20,6 +20,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import org.example.entity.Album;
 import org.example.entity.Artist;
+import org.example.entity.Playlist;
 import org.example.entity.Song;
 import org.example.repo.*;
 
@@ -37,12 +38,14 @@ public class MyPod extends Application {
     private final SongRepository songRepo = new SongRepositoryImpl();
     private final ArtistRepository artistRepo = new ArtistRepositoryImpl();
     private final AlbumRepository albumRepo = new AlbumRepositoryImpl();
+    private final PlaylistRepository playlistRepo = new PlaylistRepositoryImpl();
     private final ItunesApiClient apiClient = new ItunesApiClient();
 
     // Listor som håller datan vi hämtat från databasen
     private List<Song> songs;
     private List<Artist> artists;
     private List<Album> albums;
+    private List<Playlist> playlists;
 
     // --- MENY-DATA ---
     // Huvudmenyns alternativ. "ObservableList" är en speciell lista i JavaFX
@@ -181,9 +184,14 @@ public class MyPod extends Application {
         // Om man klickar på ordet MENU med musen går man tillbaka
         menu.setOnMouseClicked(e -> showMainMenu());
 
-        Label ff = new Label("⏭"); ff.getStyleClass().add("wheel-text"); ff.setId("ff-button");
-        Label rew = new Label("⏮"); rew.getStyleClass().add("wheel-text"); rew.setId("rew-button");
-        Label play = new Label("▶"); play.getStyleClass().add("wheel-text-play");
+        Label ff = new Label("⏭");
+        ff.getStyleClass().add("wheel-text");
+        ff.setId("ff-button");
+        Label rew = new Label("⏮");
+        rew.getStyleClass().add("wheel-text");
+        rew.setId("rew-button");
+        Label play = new Label("▶");
+        play.getStyleClass().add("wheel-text-play");
 
         wheel.getChildren().addAll(outerWheel, centerButton, menu, ff, rew, play);
         return wheel;
@@ -350,8 +358,12 @@ public class MyPod extends Application {
      * Öppnar det externa fönstret "ItunesPlayList".
      */
     private void openMusicPlayer() {
-        ItunesPlayList itunesPlayList = new ItunesPlayList();
-        itunesPlayList.showLibrary(this.songs);
+        if (this.playlists == null || this.playlists.isEmpty()) {
+            System.out.println("Playlists not loaded yet.");
+            return;
+        }
+        ItunesPlayList itunesPlayList = new ItunesPlayList(playlistRepo);
+        itunesPlayList.showLibrary(this.playlists);
     }
 
     /**
@@ -361,13 +373,14 @@ public class MyPod extends Application {
     private void initializeData() {
         try {
             EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
-            DatabaseInitializer initializer = new DatabaseInitializer(apiClient, songRepo, albumRepo, artistRepo);
+            DatabaseInitializer initializer = new DatabaseInitializer(apiClient, songRepo, albumRepo, artistRepo, playlistRepo);
             initializer.init(); // Fyll databasen om den är tom
 
             // Hämta data till minnet
             this.songs = songRepo.findAll();
             this.artists = artistRepo.findAll();
             this.albums = albumRepo.findAll();
+            this.playlists = playlistRepo.findAll();
         } catch (Exception e) {
             System.err.println("Kunde inte ladda data: " + e.getMessage());
         }

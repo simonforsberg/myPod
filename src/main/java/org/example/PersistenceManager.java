@@ -10,11 +10,9 @@ import org.hibernate.jpa.HibernatePersistenceConfiguration;
 import java.util.List;
 
 public class PersistenceManager {
-
     private static final EntityManagerFactory emf;
 
     static {
-
         List<Class<?>> entities = getEntities("org.example.entity");
 
         final PersistenceConfiguration cfg = new HibernatePersistenceConfiguration("emf")
@@ -31,7 +29,6 @@ public class PersistenceManager {
 
         //From CodeRabbit: Register a shutdown hook to properly release database connections on JVM exit.
         Runtime.getRuntime().addShutdownHook(new Thread(emf::close));
-
     }
 
     public static EntityManagerFactory getEntityManagerFactory() {

@@ -1,6 +1,5 @@
 package org.example;
 
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,31 +12,38 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import java.util.HashMap;
+import org.example.entity.Playlist;
+import org.example.entity.Song;
+import org.example.repo.PlaylistRepository;
+import org.example.repo.PlaylistRepositoryImpl;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * Huvudklass för GUI:t. Hanterar visning av bibliotek, spellistor och sökning.
  */
 public class ItunesPlayList {
 
-    // --- DATAMODELLER ---
+    // PlaylistRepository pri = new PlaylistRepositoryImpl();
 
-    // En Map som lagrar alla spellistor. Nyckeln är namnet (t.ex. "Musik") och värdet är listan med låtar.
-    private Map<String, ObservableList<DisplaySong>> allPlaylists = new HashMap<>();
+    private final PlaylistRepository pri;
 
-    // Listan med namn på spellistor som visas i vänstermenyn (Sidebar).
-    // "ObservableList" gör att GUI:t uppdateras automatiskt om vi lägger till/tar bort namn här.
-    private ObservableList<String> playlistNames = FXCollections.observableArrayList();
+    public ItunesPlayList(PlaylistRepository playlistRepository) {
+        this.pri = playlistRepository;
+    }
+
+    // --- DATAMODELL ---
+
+    // En lista med alla playlist som finns i databasen
+    private ObservableList<Playlist> allPlaylistList = FXCollections.observableArrayList();
 
     // --- GUI KOMPONENTER ---
 
     // Tabellen i mitten som visar låtarna
-    private TableView<DisplaySong> songTable = new TableView<>();
+    private TableView<Song> songTable = new TableView<>();
 
     // Listan till vänster där man väljer spellista
-    private ListView<String> sourceList = new ListView<>();
+    private ListView<Playlist> sourceList = new ListView<>();
 
     // Textfält för den "digitala displayen" högst upp
     private Text lcdTitle = new Text("myTunes");
@@ -45,13 +51,14 @@ public class ItunesPlayList {
 
     /**
      * Bygger upp hela gränssnittet och visar fönstret.
-     * @param dbSongs En lista med låtar hämtade från databasen/backend.
+     *
+     * @param dbPlaylists En lista med playlist hämtade från databasen/backend.
      */
-    public void showLibrary(List<org.example.entity.Song> dbSongs) {
+    public void showLibrary(List<Playlist> dbPlaylists) {
         Stage stage = new Stage();
 
-        // Konvertera databas-objekten till vår interna DisplaySong-klass och skapa grundlistorna
-        initData(dbSongs);
+        // Lägg till existerande playlist i vår lokala lista
+        allPlaylistList.setAll(dbPlaylists);
 
         // BorderPane är huvudlayouten: Top, Left, Center, Bottom
         BorderPane root = new BorderPane();
@@ -86,19 +93,34 @@ public class ItunesPlayList {
         // ---------------------------------------------------------
         // 2. VÄNSTER (Spellistorna)
         // ---------------------------------------------------------
-        sourceList.setItems(playlistNames); // Koppla data till listan
+
+        sourceList.setItems(allPlaylistList); // Koppla data till listan
         sourceList.getStyleClass().add("source-list");
         sourceList.setPrefWidth(200);
+
+        sourceList.setCellFactory(sl -> new ListCell<>() {
+            @Override
+            protected void updateItem(Playlist playlist, boolean empty) {
+                super.updateItem(playlist, empty);
+                if (empty || playlist == null) {
+                    setText(null);
+                } else {
+                    setText(playlist.getName());
+                }
+            }
+        });
 
         // Lyssnare: Vad händer när man klickar på en spellista i menyn?
         sourceList.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
             if (newVal != null) {
                 searchField.clear(); // Rensa gammal sökning
                 // Hämta låtlistan från vår Map baserat på namnet och visa i tabellen
-                songTable.setItems(allPlaylists.get(newVal));
+                ObservableList<Song> songList = FXCollections.observableArrayList(newVal.getSongs().stream().toList());
+                songTable.setItems(songList);
             }
         });
-        sourceList.getSelectionModel().selectFirst(); // Välj första listan ("Musik") som startvärde
+
+        sourceList.getSelectionModel().selectFirst(); // Välj första listan ("Bibliotek") som startvärde
 
         // ---------------------------------------------------------
         // 3. MITTEN (Låttabellen)
@@ -180,18 +202,42 @@ public class ItunesPlayList {
      */
     private void setupTable() {
         // Skapa kolumner
-        TableColumn<DisplaySong, String> titleCol = new TableColumn<>("Namn");
+        TableColumn<Song, String> titleCol = new TableColumn<>("Namn");
         // Berätta för kolumnen vilket fält i DisplaySong den ska läsa från (name)
-        titleCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().name));
+        titleCol.setCellValueFactory(d -> {
+            Song s = d.getValue();
+            if (s.getTitle() != null) {
+                return new SimpleStringProperty(s.getTitle());
+            }
+            return new SimpleStringProperty("Okänd titel");
+        });
 
-        TableColumn<DisplaySong, String> artistCol = new TableColumn<>("Artist");
-        artistCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().artist));
+        TableColumn<Song, String> artistCol = new TableColumn<>("Artist");
+        artistCol.setCellValueFactory(d -> {
+            Song s = d.getValue();
+            if (s.getAlbum() != null && s.getAlbum().getArtist() != null && s.getAlbum().getArtist().getName() != null) {
+                return new SimpleStringProperty(s.getAlbum().getArtist().getName());
+            }
+            return new SimpleStringProperty("Okänd artist");
+        });
 
-        TableColumn<DisplaySong, String> albumCol = new TableColumn<>("Album");
-        albumCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().album));
+        TableColumn<Song, String> albumCol = new TableColumn<>("Album");
+        albumCol.setCellValueFactory(d -> {
+            Song s = d.getValue();
+            if (s.getAlbum() != null && s.getAlbum().getName() != null) {
+                return new SimpleStringProperty(s.getAlbum().getName());
+            }
+            return new SimpleStringProperty("Okänt album");
+        });
 
-        TableColumn<DisplaySong, String> timeCol = new TableColumn<>("Längd");
-        timeCol.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().time));
+        TableColumn<Song, String> timeCol = new TableColumn<>("Längd");
+        timeCol.setCellValueFactory(d -> {
+            Song s = d.getValue();
+            if (s.getFormattedLength() != null) {
+                return new SimpleStringProperty(s.getFormattedLength());
+            }
+            return new SimpleStringProperty("Okänd längd");
+        });
 
         songTable.getColumns().setAll(titleCol, artistCol, albumCol, timeCol);
         songTable.getStyleClass().add("song-table");
@@ -202,8 +248,12 @@ public class ItunesPlayList {
         // Lyssnare: När man klickar på en rad i tabellen -> Uppdatera LCD-displayen
         songTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
             if (newVal != null) {
-                lcdTitle.setText(newVal.name);
-                lcdArtist.setText(newVal.artist);
+                lcdTitle.setText(newVal.getTitle());
+                String artistName = "Okänd artist";
+                if (newVal.getAlbum() != null && newVal.getAlbum().getArtist() != null && newVal.getAlbum().getArtist().getName() != null) {
+                    artistName = newVal.getAlbum().getArtist().getName();
+                }
+                lcdArtist.setText(artistName);
             }
         });
     }
@@ -212,11 +262,12 @@ public class ItunesPlayList {
      * Filtrerar låtarna i den aktiva listan baserat på söktexten.
      */
     private void filterSongs(String searchText) {
-        String currentList = sourceList.getSelectionModel().getSelectedItem();
-        if (currentList == null) return;
+        Playlist selectedPlaylist = sourceList.getSelectionModel().getSelectedItem();
+        if (selectedPlaylist == null) return;
+        Long currentList = selectedPlaylist.getPlaylistId();
 
         // Hämta originaldatan för den valda spellistan
-        ObservableList<DisplaySong> masterData = allPlaylists.get(currentList);
+        ObservableList<Song> masterData = FXCollections.observableArrayList(pri.findById(currentList).getSongs());
 
         // Om sökfältet är tomt, visa allt
         if (searchText == null || searchText.isEmpty()) {
@@ -225,42 +276,21 @@ public class ItunesPlayList {
         }
 
         // Skapa en filtrerad lista som omsluter masterData
-        FilteredList<DisplaySong> filteredData = new FilteredList<>(masterData, song -> {
+        FilteredList<Song> filteredData = new FilteredList<>(masterData, song -> {
             String filter = searchText.toLowerCase();
             // Returnera true om sökordet finns i namn, artist eller album
-            return song.name.toLowerCase().contains(filter) ||
-                song.artist.toLowerCase().contains(filter) ||
-                song.album.toLowerCase().contains(filter);
+            boolean titleMatch = song.getTitle() != null && song.getTitle().toLowerCase().contains(filter);
+            boolean artistMatch = song.getAlbum() != null &&
+                song.getAlbum().getArtist() != null &&
+                song.getAlbum().getArtist().getName() != null &&
+                song.getAlbum().getArtist().getName().toLowerCase().contains(filter);
+            boolean albumMatch = song.getAlbum() != null &&
+                song.getAlbum().getName() != null &&
+                song.getAlbum().getName().toLowerCase().contains(filter);
+            return titleMatch || artistMatch || albumMatch;
         });
 
         songTable.setItems(filteredData);
-    }
-
-    /**
-     * Omvandlar databas-objekten till GUI-objekt och skapar standardlistor.
-     */
-    private void initData(List<org.example.entity.Song> dbSongs) {
-        ObservableList<DisplaySong> library = FXCollections.observableArrayList();
-
-        // Loopa igenom datan från databasen
-        if (dbSongs != null) {
-            for (org.example.entity.Song s : dbSongs) {
-                // Hantera null-värden snyggt (om artist eller album saknas)
-                String art = (s.getAlbum() != null && s.getAlbum().getArtist() != null) ? s.getAlbum().getArtist().getName() : "Okänd";
-                String alb = (s.getAlbum() != null) ? s.getAlbum().getName() : "Okänt";
-
-                // Skapa ett nytt DisplaySong-objekt
-                library.add(new DisplaySong(s.getTitle(), art, alb, s.getLength()));
-            }
-        }
-
-        // Lägg in huvudbiblioteket "Musik"
-        allPlaylists.put("Musik", library);
-        playlistNames.add("Musik");
-
-        // Skapa en tom lista för "Favoriter"
-        allPlaylists.put("Favoriter", FXCollections.observableArrayList());
-        playlistNames.add("Favoriter");
     }
 
     /**
@@ -268,41 +298,65 @@ public class ItunesPlayList {
      */
     private void createNewPlaylist() {
         TextInputDialog d = new TextInputDialog("Ny lista");
-
         // Här ändrar du fönstrets titel och text
-        d.setTitle("Skapa ny spellista");        // Ersätter "Bekräftelse"
-        d.setHeaderText("Ange namn på din nya lista"); // Rubriken inuti rutan
-        d.setContentText("Namn:");               // Texten bredvid inmatningsfältet
+        d.setTitle("Skapa ny spellista");           // Ersätter "Bekräftelse"
+        d.setHeaderText("Ange namn på spellista");  // Rubriken inuti rutan
+        d.setContentText("Namn:");                  // Texten bredvid inmatningsfältet
 
         d.showAndWait().ifPresent(name -> {
-            // Kontrollera att namnet inte är tomt och inte redan finns
-            if (!name.trim().isEmpty() && !allPlaylists.containsKey(name)) {
-                allPlaylists.put(name, FXCollections.observableArrayList());
-                playlistNames.add(name);
+            if (!name.trim().isEmpty()) {
+                Playlist pl = pri.createPlaylist(name);
+                allPlaylistList.add(pl);
             }
         });
     }
 
     /**
-     * Tar bort vald spellista (men tillåter inte att man tar bort "Musik").
+     * Ändra namn på vald spellista (men tillåter inte att man ändrar "Bibliotek"). ??
+     */
+    private void renameSelectedPlaylist() {
+        Playlist sel = sourceList.getSelectionModel().getSelectedItem();
+
+        if (sel == null || sel.getPlaylistId() == 1L || sel.getPlaylistId() == 2L) {
+            return;
+        }
+
+        TextInputDialog d = new TextInputDialog("Ändra namn");
+        d.setTitle("Byt namn på spellista");
+        d.setHeaderText("Ändra namn på spellistan");
+        d.setContentText("Nytt namn:");
+
+        d.showAndWait().ifPresent(newName -> {
+            if (!newName.trim().isEmpty()) {
+                pri.renamePlaylist(sel, newName);
+                sourceList.refresh();
+            }
+        });
+    }
+
+    /**
+     * Tar bort vald spellista (men tillåter inte att man tar bort "Bibliotek" eller "Favoriter").
      */
     private void deleteSelectedPlaylist() {
-        String sel = sourceList.getSelectionModel().getSelectedItem();
-        if (sel != null && !sel.equals("Musik")) {
-            allPlaylists.remove(sel);
-            playlistNames.remove(sel);
+        Playlist sel = sourceList.getSelectionModel().getSelectedItem();
+        if (sel != null && sel.getPlaylistId() != 1L && sel.getPlaylistId() != 2L) {
+            pri.deletePlaylist(sel);
+            allPlaylistList.remove(sel);
         }
     }
 
     /**
-     * Tar bort vald låt från den aktiva spellistan (ej från huvudbiblioteket "Musik").
+     * Tar bort vald låt från den aktiva spellistan (ej från huvudbiblioteket "Bibliotek").
      */
     private void removeSelectedSong() {
-        DisplaySong sel = songTable.getSelectionModel().getSelectedItem();
-        String list = sourceList.getSelectionModel().getSelectedItem();
-        // Skydd: Man får inte ta bort låtar direkt från "Musik"-biblioteket i denna vy
-        if (sel != null && list != null && !list.equals("Musik")) {
-            allPlaylists.get(list).remove(sel);
+        Song sel = songTable.getSelectionModel().getSelectedItem();
+        Playlist list = sourceList.getSelectionModel().getSelectedItem();
+        // Skydd: Man får inte ta bort låtar direkt från biblioteket i denna vy
+        if (sel != null && list != null && list.getPlaylistId() != 1L) {
+            pri.removeSong(list, sel);
+            //pri.save(list);
+            list.getSongs().remove(sel);
+            songTable.getItems().remove(sel);
         }
     }
 
@@ -310,49 +364,26 @@ public class ItunesPlayList {
      * Visar en popup-meny för att lägga till vald låt i en annan spellista.
      */
     private void addSelectedSong(Button anchor) {
-        DisplaySong sel = songTable.getSelectionModel().getSelectedItem();
+        Song sel = songTable.getSelectionModel().getSelectedItem();
         if (sel == null) return; // Ingen låt vald
 
         ContextMenu menu = new ContextMenu();
-        for (String n : playlistNames) {
-            if (n.equals("Musik")) continue; // Man kan inte lägga till i "Musik" (det är källan)
+        for (Playlist pl : allPlaylistList) {
+            if (pl.getPlaylistId() == 1L) continue; // Man kan inte lägga till i "Bibliotek" (det är källan)
 
-            MenuItem itm = new MenuItem(n);
+            MenuItem itm = new MenuItem(pl.getName());
             itm.setOnAction(e -> {
                 // Om låten inte redan finns i listan, lägg till den
-                if (!allPlaylists.get(n).contains(sel)) {
-                    allPlaylists.get(n).add(sel);
+                if (!pri.isSongInPlaylist(pl, sel)) {
+                    pri.addSong(pl, sel);
+                    pl.getSongs().add(sel);
+                    //pl.addSong(sel);
+                    //pri.save(pl);
                 }
             });
             menu.getItems().add(itm);
         }
         // Visa menyn vid knappen
         menu.show(anchor, anchor.getScene().getWindow().getX() + anchor.getLayoutX(), anchor.getScene().getWindow().getY() + anchor.getLayoutY());
-    }
-
-    /**
-     * En inre klass (DTO - Data Transfer Object) enbart för visning i tabellen.
-     * Detta skiljer GUI-logiken från databas-entiteterna.
-     */
-    public static class DisplaySong {
-        String name, artist, album, time;
-
-        public DisplaySong(String n, String a, String al, Long t) {
-            this.name = n;
-            this.artist = a;
-            this.album = al;
-            this.time = formatTime(t);
-        }
-
-        // Konvertera millisekunder till mm:ss
-        private String formatTime(Long millis) {
-            if (millis == null || millis < 0) return "0:00";
-
-            long seconds = millis / 1000;
-            long minutes = seconds / 60;
-            long remainingSeconds = seconds % 60;
-
-            return String.format("%d:%02d", minutes, remainingSeconds);
-        }
     }
 }

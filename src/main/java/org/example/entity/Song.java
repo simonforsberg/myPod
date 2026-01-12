@@ -44,6 +44,16 @@ public class Song {
         return new Song(dto.trackId(), dto.trackName(), dto.trackTimeMillis(), album);
     }
 
+    public String getFormattedLength() {
+        if (length == null) return "0:00";
+
+        long seconds = length / 1000;
+        long minutes = seconds / 60;
+        long remainingSeconds = seconds % 60;
+
+        return String.format("%d:%02d", minutes, remainingSeconds);
+    }
+
     public Set<Playlist> getPlaylist() {
         return playlist;
     }
@@ -75,7 +85,6 @@ public class Song {
     public void setLength(Long length) {
         this.length = length;
     }
-
 
     public Album getAlbum() {
         return album;

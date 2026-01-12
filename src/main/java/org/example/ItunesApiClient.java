@@ -57,18 +57,21 @@ public class ItunesApiClient {
         for (JsonNode node : results) {
             ItunesDTO song = mapper.treeToValue(node, ItunesDTO.class);
 
-            if (song.artistName() == null) { continue; }
+            if (song.artistName() == null) {
+                continue;
+            }
 
             String normalizedArtist = normalize(song.artistName());
 
-            if(normalizedTerm.equals(normalizedArtist)) {
+            if (normalizedTerm.equals(normalizedArtist)) {
                 songs.add(song);
             }
         }
 
         return songs;
     }
-    public String normalize (String s){
+
+    public String normalize(String s) {
         if (s == null) {
             return "";
         }

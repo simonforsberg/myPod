@@ -13,5 +13,4 @@ public interface ArtistRepository {
     List<Artist> findAll();
 
     Long count();
-
 }
