@@ -14,7 +14,11 @@ import java.util.Set;
 
 public class PlaylistRepositoryImpl implements PlaylistRepository {
 
-    private final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+    private final EntityManagerFactory emf;
+
+    public PlaylistRepositoryImpl(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
 
     @Override
     public void save(Playlist p) {

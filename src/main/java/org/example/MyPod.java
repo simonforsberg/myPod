@@ -35,10 +35,10 @@ public class MyPod extends Application {
 
     // --- DATA-LAGER ---
     // Repositories används för att hämta data från databasen istället för att hårdkoda den.
-    private final SongRepository songRepo = new SongRepositoryImpl();
-    private final ArtistRepository artistRepo = new ArtistRepositoryImpl();
-    private final AlbumRepository albumRepo = new AlbumRepositoryImpl();
-    private final PlaylistRepository playlistRepo = new PlaylistRepositoryImpl();
+    private final SongRepository songRepo = new SongRepositoryImpl(PersistenceManager.getEntityManagerFactory());
+    private final ArtistRepository artistRepo = new ArtistRepositoryImpl(PersistenceManager.getEntityManagerFactory());
+    private final AlbumRepository albumRepo = new AlbumRepositoryImpl(PersistenceManager.getEntityManagerFactory());
+    private final PlaylistRepository playlistRepo = new PlaylistRepositoryImpl(PersistenceManager.getEntityManagerFactory());
     private final ItunesApiClient apiClient = new ItunesApiClient();
 
     // Listor som håller datan vi hämtat från databasen

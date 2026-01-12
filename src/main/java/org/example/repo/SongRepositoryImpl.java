@@ -11,7 +11,11 @@ import java.util.List;
 
 public class SongRepositoryImpl implements SongRepository {
 
-    private final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+    private final EntityManagerFactory emf;
+
+    public SongRepositoryImpl(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
 
     @Override
     public Long count() {
