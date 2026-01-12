@@ -342,7 +342,7 @@ public class ItunesPlayList {
                 }
 
                 Playlist currentList = sourceList.getSelectionModel().getSelectedItem();
-                removeSongItem.setVisible(currentList != null && !currentList.getPlaylistId().equals(1L));
+                removeSongItem.setVisible(currentList != null && currentList.getPlaylistId() != null && !currentList.getPlaylistId().equals(1L));
             });
 
             contextMenu.getItems().addAll(addSongSubMenu, new SeparatorMenuItem(), removeSongItem);
@@ -419,7 +419,7 @@ public class ItunesPlayList {
     private void renameSelectedPlaylist() {
         Playlist sel = sourceList.getSelectionModel().getSelectedItem();
 
-        if (sel == null || sel.getPlaylistId().equals(1L) || sel.getPlaylistId().equals(2L)) {
+        if (sel == null || sel.getPlaylistId() == null || sel.getPlaylistId().equals(1L) || sel.getPlaylistId().equals(2L)) {
             return;
         }
 
@@ -442,7 +442,7 @@ public class ItunesPlayList {
      */
     private void deleteSelectedPlaylist() {
         Playlist sel = sourceList.getSelectionModel().getSelectedItem();
-        if (sel != null && !sel.getPlaylistId().equals(1L) && !sel.getPlaylistId().equals(2L)) {
+        if (sel != null && sel.getPlaylistId() != null && !sel.getPlaylistId().equals(1L) && !sel.getPlaylistId().equals(2L)) {
             pri.deletePlaylist(sel);
             allPlaylistList.remove(sel);
         }
@@ -455,7 +455,7 @@ public class ItunesPlayList {
         Song sel = songTable.getSelectionModel().getSelectedItem();
         Playlist list = sourceList.getSelectionModel().getSelectedItem();
         // Skydd: Man får inte ta bort låtar direkt från biblioteket i denna vy
-        if (sel != null && list != null && !list.getPlaylistId().equals(1L)) {
+        if (sel != null && list != null && list.getPlaylistId() != null && !list.getPlaylistId().equals(1L)) {
             pri.removeSong(list, sel);
             list.getSongs().remove(sel);
             songTable.getItems().remove(sel);
@@ -471,7 +471,8 @@ public class ItunesPlayList {
 
         ContextMenu menu = new ContextMenu();
         for (Playlist pl : allPlaylistList) {
-            if (pl.getPlaylistId().equals(1L)) continue; // Man kan inte lägga till i "Bibliotek" (det är källan)
+            if (pl.getPlaylistId() != null && pl.getPlaylistId().equals(1L))
+                continue; // Man kan inte lägga till i "Bibliotek" (det är källan)
 
             MenuItem itm = new MenuItem(pl.getName());
             itm.setOnAction(e -> {
