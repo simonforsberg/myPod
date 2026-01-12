@@ -9,7 +9,11 @@ import java.util.List;
 
 public class AlbumRepositoryImpl implements AlbumRepository {
 
-    private final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+    private final EntityManagerFactory emf;
+
+    public AlbumRepositoryImpl (EntityManagerFactory emf) {
+        this.emf = emf;
+    }
 
     @Override
     public boolean existsByUniqueId(Album album) {

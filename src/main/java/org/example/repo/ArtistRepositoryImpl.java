@@ -10,7 +10,11 @@ import java.util.List;
 
 public class ArtistRepositoryImpl implements ArtistRepository {
 
-    private final EntityManagerFactory emf = PersistenceManager.getEntityManagerFactory();
+    private final EntityManagerFactory emf;
+
+    public ArtistRepositoryImpl (EntityManagerFactory emf){
+        this.emf = emf;
+    }
 
     @Override
     public boolean existsByUniqueId(Artist artist) {
