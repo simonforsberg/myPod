@@ -358,7 +358,7 @@ public class MyPod extends Application {
      * Öppnar det externa fönstret "ItunesPlayList".
      */
     private void openMusicPlayer() {
-        ItunesPlayList itunesPlayList = new ItunesPlayList();
+        ItunesPlayList itunesPlayList = new ItunesPlayList(playlistRepo);
         itunesPlayList.showLibrary(this.playlists);
     }
 

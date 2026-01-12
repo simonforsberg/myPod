@@ -24,7 +24,13 @@ import java.util.List;
  */
 public class ItunesPlayList {
 
-    PlaylistRepository pri = new PlaylistRepositoryImpl();
+    // PlaylistRepository pri = new PlaylistRepositoryImpl();
+
+    private final PlaylistRepository pri;
+
+    public ItunesPlayList(PlaylistRepository playlistRepository) {
+        this.pri = playlistRepository;
+    }
 
     // --- DATAMODELL ---
 
@@ -256,8 +262,9 @@ public class ItunesPlayList {
      * Filtrerar låtarna i den aktiva listan baserat på söktexten.
      */
     private void filterSongs(String searchText) {
-        Long currentList = sourceList.getSelectionModel().getSelectedItem().getPlaylistId();
-        if (currentList == null) return;
+        Playlist selectedPlaylist = sourceList.getSelectionModel().getSelectedItem();
+        if (selectedPlaylist == null) return;
+        Long currentList = selectedPlaylist.getPlaylistId();
 
         // Hämta originaldatan för den valda spellistan
         ObservableList<Song> masterData = FXCollections.observableArrayList(pri.findById(currentList).getSongs());
@@ -303,8 +310,6 @@ public class ItunesPlayList {
             }
         });
     }
-
-    // TODO, Metod för att byta namn på spellista
 
     /**
      * Ändra namn på vald spellista (men tillåter inte att man ändrar "Bibliotek"). ??
@@ -380,20 +385,5 @@ public class ItunesPlayList {
         }
         // Visa menyn vid knappen
         menu.show(anchor, anchor.getScene().getWindow().getX() + anchor.getLayoutX(), anchor.getScene().getWindow().getY() + anchor.getLayoutY());
-    }
-
-    /**
-     * En inre klass (DTO - Data Transfer Object) enbart för visning i tabellen.
-     * Detta skiljer GUI-logiken från databas-entiteterna.
-     */
-    public static class DisplaySong {
-        String name, artist, album, time;
-
-        public DisplaySong(String n, String a, String al, String formattedTime) {
-            this.name = n;
-            this.artist = a;
-            this.album = al;
-            this.time = formattedTime;
-        }
     }
 }
