@@ -2,7 +2,8 @@ package org.example;
 
 import org.example.entity.Playlist;
 import org.example.entity.Song;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,10 +114,7 @@ class PlaylistRepoTest extends RepoTest {
     void addSongsToPlaylist_shouldPersistRelation() {
         // Given
         Playlist playlist = playlistRepo.createPlaylist("Playlist");
-        List<Song> testSongs = new ArrayList<>();
-        testSongs.add(testSong1);
-        testSongs.add(testSong2);
-        testSongs.add(testSong3);
+        List<Song> testSongs = List.of(testSong1, testSong2, testSong3);
 
         // When
         playlistRepo.addSongs(playlist, testSongs);
@@ -141,7 +139,6 @@ class PlaylistRepoTest extends RepoTest {
         // Then
         Playlist reloaded = playlistRepo.findById(playlist.getPlaylistId());
 
-        assertThat(reloaded.getSongs()).hasSize(0);
-        assertThat(reloaded.getSongs().contains(testSong1)).isFalse();
+        assertThat(reloaded.getSongs()).isEmpty();
     }
 }

@@ -35,7 +35,7 @@ public class ArtistRepoTest extends RepoTest {
     @DisplayName("Should save new artist and make it findable")
     void save_shouldSaveNewArtist() {
         // Given
-        Artist testArtist3 = new Artist(12L,"A Tribe Called Test", "USA");
+        Artist testArtist3 = new Artist(12L, "A Tribe Called Test", "USA");
 
         // When
         artistRepo.save(testArtist3);

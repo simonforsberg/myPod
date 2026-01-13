@@ -36,14 +36,14 @@ public class AlbumRepoTest extends RepoTest {
     @DisplayName("Should save new album and make it findable")
     void save_shouldSaveNewAlbum() {
         // Given
-        Album testAlbum3 = new Album(33L, "To Test A Butterfly", "Hiphop", 2026, 11L, null, testArtist1);
+        Album newAlbum = new Album(33L, "To Test A Butterfly", "Hiphop", 2026, 11L, null, testArtist1);
 
         // When
-        albumRepo.save(testAlbum3);
+        albumRepo.save(newAlbum);
         List<Album> albums = albumRepo.findAll();
 
         // Then
-        assertThat(albums).contains(testAlbum3);
+        assertThat(albums).contains(newAlbum);
     }
 
     @Test
