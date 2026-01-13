@@ -50,7 +50,7 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
             return false;
         }
         try (var em = emf.createEntityManager()) {
-            return em.createQuery("select count(pl) from Playlist pl where pl.Id = :playlistId", Long.class)
+            return em.createQuery("select count(pl) from Playlist pl where pl.id = :playlistId", Long.class)
                 .setParameter("playlistId", id)
                 .getSingleResult() > 0;
         }
