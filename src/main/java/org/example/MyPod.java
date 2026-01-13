@@ -272,12 +272,11 @@ public class MyPod extends Application {
      */
     private void updateMenu() {
         for (int i = 0; i < menuLabels.size(); i++) {
-            Label label = menuLabels.get(i).label();
             if (i == selectedIndex) {
-                label.getStyleClass().add("selected-item"); // Gör texten markerad
-                ensureVisible(label); // Se till att scrollbaren flyttas så vi ser valet
+                menuLabels.get(i).label().getStyleClass().add("selected-item"); // Gör texten markerad
+                ensureVisible(menuLabels.get(i).label()); // Se till att scrollbaren flyttas så vi ser valet
             } else {
-                label.getStyleClass().remove("selected-item"); // Ta bort markering
+                menuLabels.get(i).label().getStyleClass().remove("selected-item"); // Ta bort markering
             }
         }
     }
@@ -410,7 +409,10 @@ public class MyPod extends Application {
                 return;
             }
 
-            Playlist selectedPlaylist = playlistRepo.findById(selection.object().getId());
+            Playlist selectedPlaylist = playlists.stream()
+                .filter(p -> p.getId()
+                    .equals(selection.object.getId()))
+                .findFirst().orElse(null);
 
             if (selectedPlaylist != null) {
                 openPlaylist(selectedPlaylist);
