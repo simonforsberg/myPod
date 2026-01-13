@@ -8,9 +8,10 @@ public interface ArtistRepository {
 
     boolean existsByUniqueId(Artist artist);
 
+    Long count();
+
     void save(Artist artist);
 
     List<Artist> findAll();
 
-    Long count();
 }

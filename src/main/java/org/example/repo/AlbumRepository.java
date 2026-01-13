@@ -9,6 +9,8 @@ public interface AlbumRepository {
 
     boolean existsByUniqueId(Album album);
 
+    Long count();
+
     void save(Album album);
 
     List<Album> findAll();
@@ -17,5 +19,4 @@ public interface AlbumRepository {
 
     List<Album> findByGenre(String genre);
 
-    Long count();
 }

@@ -11,7 +11,11 @@ import java.util.Set;
 
 public interface PlaylistRepository {
 
+    boolean existsByUniqueId(Long id);
+
     List<Playlist> findAll();
+
+    Playlist findById(Long id);
 
     Set<Song> findSongsInPlaylist(Playlist playlist);
 
@@ -19,9 +23,7 @@ public interface PlaylistRepository {
 
     Playlist createPlaylist(String name);
 
-    boolean existsByUniqueId(Long id);
-
-    Playlist findById(Long id);
+    void renamePlaylist(Playlist playlist, String newName);
 
     void deletePlaylist(Playlist playlist);
 
@@ -31,5 +33,4 @@ public interface PlaylistRepository {
 
     void removeSong(Playlist playlist, Song song);
 
-    void renamePlaylist(Playlist playlist, String newName);
 }

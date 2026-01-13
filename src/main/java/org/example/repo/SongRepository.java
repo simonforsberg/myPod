@@ -7,9 +7,10 @@ import org.example.entity.Song;
 import java.util.List;
 
 public interface SongRepository {
-    Long count();
 
     boolean existsByUniqueId(Song song);
+
+    Long count();
 
     void save(Song song);
 
@@ -17,7 +18,6 @@ public interface SongRepository {
 
     List<Song> findByArtist(Artist artist);
 
-    // Redundant?
     List<Song> findByAlbum(Album album);
 
     List<Song> findByGenre(String genre);

@@ -1,7 +1,6 @@
 package org.example.repo;
 
 import jakarta.persistence.EntityManagerFactory;
-import org.example.PersistenceManager;
 import org.example.entity.Album;
 import org.example.entity.Artist;
 import org.example.entity.Song;
