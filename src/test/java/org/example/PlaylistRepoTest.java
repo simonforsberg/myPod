@@ -51,13 +51,13 @@ class PlaylistRepoTest {
         // given
         Artist artist = new Artist(1L, "Blabla", "Sweden");
         artistRepo.save(artist);
-        Album album = new Album(1L, "Title", "Rock", 1992, 12L, artist);
+        Album album = new Album(1L, "Title", "Rock", 1992, 12L, null, artist);
         albumRepo.save(album);
-        Song song = new Song(1L, "Title", 33333L, album);
+        Song song = new Song(1L, "Title", 33333L, "previewUrl", album);
         songRepo.save(song);
 
         Playlist playlist = playlistRepo.createPlaylist("Playlist");
-        
+
         // when
         playlistRepo.addSong(playlist, song);
 
