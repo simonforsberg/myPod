@@ -234,7 +234,6 @@ public class MyPod extends Application {
 
             }
 
-            ///  NY KOD SLUT ///
             int totalItems = menuLabels.size();
             if (totalItems == 0) return; // Gör inget om listan är tom
 
@@ -542,15 +541,21 @@ public class MyPod extends Application {
         titleLabel.getStyleClass().add("now-playing-title");
         titleLabel.setWrapText(true);
 
-        String artistName = (currentSong != null && currentSong.getAlbum() != null && currentSong.getAlbum().getArtist() != null)
-            ? currentSong.getAlbum().getArtist().getName()
-            : "Unknown Artist";
+        String artistName;
+        if (currentSong != null && currentSong.getAlbum() != null && currentSong.getAlbum().getArtist() != null) {
+            artistName = currentSong.getAlbum().getArtist().getName();
+        } else {
+            artistName = "Unknown Artist";
+        }
         Label artistLabel = new Label(artistName);
         artistLabel.getStyleClass().add("now-playing-artist");
 
-        String albumName = (currentSong != null && currentSong.getAlbum() != null)
-            ? currentSong.getAlbum().getName()
-            : "Unknown Album";
+        String albumName;
+        if(currentSong != null && currentSong.getAlbum() != null) {
+            albumName = currentSong.getAlbum().getName();
+        } else {
+            albumName = "Unknown Album";
+        }
         Label albumLabel = new Label(albumName);
         albumLabel.getStyleClass().add("now-playing-album");
 
