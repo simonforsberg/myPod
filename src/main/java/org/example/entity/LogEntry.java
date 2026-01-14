@@ -10,11 +10,16 @@ public class LogEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "\"level\"")
     private String level;
+
+    @Column(name = "\"message\"")
     private String message;
 
     @Column(name = "error_details", columnDefinition = "TEXT")
     private String errorDetails;
 
+
+    @Column(name = "\"timestamp\"")
     private LocalDateTime timestamp;
 }
