@@ -52,7 +52,7 @@ import java.util.List;
  */
 public class MyPod extends Application {
 
-    private static final Logger logger = LoggerFactory.getLogger(MyPod.class);
+
 
     private String currentScreenName = "";
     private Playlist currentActivePlaylist = null;
@@ -91,6 +91,8 @@ public class MyPod extends Application {
     private ProgressBar progressBar;
     private ProgressBar volumeBar;
     private PauseTransition volumeHideTimer;
+
+    private static final Logger logger = LoggerFactory.getLogger(MyPod.class);
 
     @Override
     public void start(Stage primaryStage) {
