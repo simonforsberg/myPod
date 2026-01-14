@@ -320,24 +320,24 @@ public class MyPod extends Application {
         switch (screenName) {
             case "Songs" -> {
                 if (songs != null && !songs.isEmpty()) {
-                    songs.forEach(s -> addMenuItem(s.getName()));
+                    songs.forEach(this::addMenuItem);
                 } else addMenuItem("No songs found");
             }
             case "Artists" -> {
                 if (artists != null && !artists.isEmpty()) {
-                    artists.forEach(a -> addMenuItem(a.getName()));
+                    artists.forEach(this::addMenuItem);
                 } else addMenuItem("No artists found");
             }
             case "Albums" -> {
                 if (albums != null && !albums.isEmpty()) {
-                    albums.forEach(al -> addMenuItem(al.getName()));
+                    albums.forEach(this::addMenuItem);
                 } else addMenuItem("No albums found");
             }
             /// NY KOD ///
             case "Playlists" -> {
                 addMenuItem("Edit Playlists");
                 if (playlists != null && !playlists.isEmpty()) {
-                    playlists.forEach(pl -> addMenuItem(pl.getName()));
+                    playlists.forEach(this::addMenuItem);
                 } else addMenuItem("No playlists found");
                 ///  SLUT NY KOD ///
             }
@@ -427,20 +427,22 @@ public class MyPod extends Application {
 
     /// NY KOD ///
     private void openPlaylist(Playlist p) {
+        Playlist updatedPlaylist = playlistRepo.findById(p.getId());
+
         screenContent.getChildren().clear();
         menuLabels.clear();
         selectedIndex = 0;
 
         currentScreenName = "PlaylistSongs";
-        currentActivePlaylist = p;
+        currentActivePlaylist = updatedPlaylist;
 
-        Label title = new Label(p.getName());
+        Label title = new Label(updatedPlaylist.getName());
         title.getStyleClass().add("screen-title");
         screenContent.getChildren().add(title);
 
 
-        if (p.getSongs() != null && !p.getSongs().isEmpty()) {
-            List<Song> playlistSongs = new ArrayList<>(p.getSongs());
+        if (updatedPlaylist.getSongs() != null && !updatedPlaylist.getSongs().isEmpty()) {
+            List<Song> playlistSongs = new ArrayList<>(updatedPlaylist.getSongs());
             for (Song s : playlistSongs) {
                 addMenuItem(s);
             }
@@ -507,7 +509,7 @@ public class MyPod extends Application {
                 .toList();
 
             if (!artistSongs.isEmpty()) {
-                artistSongs.forEach(s -> addMenuItem(s.getName()));
+                artistSongs.forEach(this::addMenuItem);
             } else {
                 addMenuItem("No songs found");
             }
@@ -533,7 +535,7 @@ public class MyPod extends Application {
                     al.getAlbum().getId().equals(selection.object().getId())).toList();
 
             if (!albumSongs.isEmpty()) {
-                albumSongs.forEach(s -> addMenuItem(s.getName()));
+                albumSongs.forEach(this::addMenuItem);
             } else {
                 addMenuItem("No songs found");
             }
