@@ -468,18 +468,18 @@ public class MyPod extends Application {
         itunesPlayList.setOnUpdate(() -> {
             new Thread(() -> {
                 try {
-                List<Playlist> updatedPlaylists = playlistRepo.findAll();
-                Platform.runLater(() -> {
-                    this.playlists = updatedPlaylists;
-                    if ("Playlists".equals(currentScreenName)) {
-                        showScreen("Playlists");
-                    } else if ("PlaylistSongs".equals(currentScreenName) && currentActivePlaylist != null) {
-                        playlists.stream()
-                            .filter(p -> p.getId().equals(currentActivePlaylist.getId()))
-                            .findFirst()
-                            .ifPresent(this::openPlaylist);
-                    }
-                });
+                    List<Playlist> updatedPlaylists = playlistRepo.findAll();
+                    Platform.runLater(() -> {
+                        this.playlists = updatedPlaylists;
+                        if ("Playlists".equals(currentScreenName)) {
+                            showScreen("Playlists");
+                        } else if ("PlaylistSongs".equals(currentScreenName) && currentActivePlaylist != null) {
+                            playlists.stream()
+                                .filter(p -> p.getId().equals(currentActivePlaylist.getId()))
+                                .findFirst()
+                                .ifPresent(this::openPlaylist);
+                        }
+                    });
                 } catch (Exception e) {
                     System.err.println("Failed to refresh playlists: " + e.getMessage());
                 }
@@ -498,8 +498,9 @@ public class MyPod extends Application {
 
         currentScreenName = "ArtistSongs";
 
-        selection.label().getStyleClass().add("screen-title");
-        screenContent.getChildren().add(selection.label());
+        Label titleLabel = new Label(selection.getText());
+        titleLabel.getStyleClass().add("screen-title");
+        screenContent.getChildren().add(titleLabel);
 
         if (songs != null && !songs.isEmpty()) {
             List<Song> artistSongs = songs.stream()
@@ -526,8 +527,9 @@ public class MyPod extends Application {
 
         currentScreenName = "AlbumSongs";
 
-        selection.label().getStyleClass().add("screen-title");
-        screenContent.getChildren().add(selection.label());
+        Label titleLabel = new Label(selection.getText());
+        titleLabel.getStyleClass().add("screen-title");
+        screenContent.getChildren().add(titleLabel);
 
         if (songs != null && !songs.isEmpty()) {
             List<Song> albumSongs = songs.stream()
@@ -551,10 +553,13 @@ public class MyPod extends Application {
         selectedIndex = 0;
         currentScreenName = "NowPlaying";
 
-        Song currentSong = (songs != null) ? songs.stream()
-            .filter(s -> s.getId().equals(selection.object().getId()))
-            .findFirst()
-            .orElse(null) : null;
+        Song currentSong = null;
+        if (songs != null && selection.object() != null) {
+            currentSong = songs.stream()
+                .filter(s -> s.getId().equals(selection.object().getId()))
+                .findFirst()
+                .orElse(null);
+        }
 
         // Skapa elementen och tilldela klasser
         Label header = new Label("▶ NOW PLAYING");
@@ -663,11 +668,11 @@ public class MyPod extends Application {
 
     private record ObjectLabel(
         Label label,
-        DBObject object){
+        DBObject object) { // object is null for static menu items like "Edit Playlists"
 
-        public String getText(){
+        public String getText() {
             return label.getText();
         }
-    };
+    }
 
 }
