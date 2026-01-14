@@ -22,4 +22,14 @@ public class LogEntry {
 
     @Column(name = "\"timestamp\"")
     private LocalDateTime timestamp;
+
+    public Long getId() { return id; }
+
+    public String getLevel() { return level; }
+
+    public String getMessage() { return message; }
+
+    public String getErrorDetails() { return errorDetails; }
+
+    public LocalDateTime getTimestamp() { return timestamp; }
 }

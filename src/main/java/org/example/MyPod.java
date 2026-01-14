@@ -52,6 +52,7 @@ import java.util.List;
  */
 public class MyPod extends Application {
 
+    private static final Logger logger = LoggerFactory.getLogger(MyPod.class);
 
     private String currentScreenName = "";
     private Playlist currentActivePlaylist = null;
@@ -90,8 +91,6 @@ public class MyPod extends Application {
     private ProgressBar progressBar;
     private ProgressBar volumeBar;
     private PauseTransition volumeHideTimer;
-
-    private static final Logger logger = LoggerFactory.getLogger(MyPod.class);
 
     @Override
     public void start(Stage primaryStage) {
@@ -145,7 +144,7 @@ public class MyPod extends Application {
             // Försök ladda CSS-filen för styling
             scene.getStylesheets().add(getClass().getResource("/ipod_style.css").toExternalForm());
         } catch (Exception e) {
-            logger.info("CSS hittades inte, kör utan styling.");
+            logger.info("Start: CSS not found");
         }
 
         myPodScreen.setFocusTraversable(true);
@@ -577,7 +576,7 @@ public class MyPod extends Application {
                         }
                     });
                 } catch (Exception e) {
-                    logger.error("Failed to refresh playlists", e);
+                    logger.error("openMusicPlayer: Failed to refresh playlists", e);
                 }
             })
                 .start();
@@ -776,7 +775,7 @@ public class MyPod extends Application {
 
             mediaPlayer.play();
         } catch (Exception e) {
-            logger.error("Could not play preview: {}", e.getMessage());
+            logger.error("playReview: Could not play preview:", e);
         }
     }
 
@@ -805,7 +804,7 @@ public class MyPod extends Application {
             this.albums = albumRepo.findAll();
             this.playlists = playlistRepo.findAll();
         } catch (Exception e) {
-            logger.error("Kunde inte ladda data: {}", e.getMessage());
+            logger.error("initializeData: Failed to load data", e);
         }
     }
 

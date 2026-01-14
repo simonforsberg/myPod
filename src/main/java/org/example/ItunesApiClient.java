@@ -53,7 +53,7 @@ public class ItunesApiClient {
         JsonNode root = mapper.readTree(response.body());
         JsonNode results = root.get("results");
         if (results == null || !results.isArray()) {
-            logger.info("searchSongs: no results");
+            logger.debug("searchSongs: no results");
             return List.of();
         }
 
@@ -64,7 +64,7 @@ public class ItunesApiClient {
             ItunesDTO song = mapper.treeToValue(node, ItunesDTO.class);
 
             if (song.artistName() == null) {
-                logger.error("searchSongs: artistName is null");
+                logger.warn("searchSongs: artistName is null");
                 continue;
             }
 

@@ -76,7 +76,7 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
     @Override
     public Set<Song> findSongsInPlaylist(Playlist playlist) {
         if (playlist == null) {
-            logger.error("findsongsInPlaylist: playlist is null");
+            logger.error("findSongsInPlaylist: playlist is null");
             throw new IllegalArgumentException("playlist cannot be null");
         }
         return emf.callInTransaction(em -> {
@@ -88,7 +88,7 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
     @Override
     public boolean isSongInPlaylist(Playlist playlist, Song song) {
         if (playlist == null || song == null) {
-            logger.error("insongInPlaylist: playlist or song is null");
+            logger.error("isSongInPlaylist: playlist or song is null");
             throw new IllegalArgumentException("playlist and song cannot be null");
         }
         try (var em = emf.createEntityManager()) {

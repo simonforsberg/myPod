@@ -52,7 +52,7 @@ public class SongRepositoryImpl implements SongRepository {
     @Override
     public List<Song> findByArtist(Artist artist) {
         if (artist == null) {
-            logger.info("findByArtist: artist is null");
+            logger.debug("findByArtist: artist is null");
             return new ArrayList<>();
         }
 
@@ -74,7 +74,7 @@ public class SongRepositoryImpl implements SongRepository {
     @Override
     public List<Song> findByAlbum(Album album) {
         if (album == null) {
-            logger.info("findByAlbum: album is null");
+            logger.debug("findByAlbum: album is null");
             return new ArrayList<>();
         }
 
@@ -96,7 +96,7 @@ public class SongRepositoryImpl implements SongRepository {
     @Override
     public List<Song> findByGenre(String genre) {
         if (genre == null || genre.isBlank()) {
-            logger.info("findByGenre: genre is null or blank");
+            logger.debug("findByGenre: genre is null or blank");
             return new ArrayList<>();
         }
 

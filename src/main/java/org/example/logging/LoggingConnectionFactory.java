@@ -11,11 +11,7 @@ public class LoggingConnectionFactory {
     private static final String PASSWORD = "pass";
 
     public static Connection getConnection() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // Ensure driver is loaded
-        } catch (ClassNotFoundException e) {
-            throw new SQLException("MySQL JDBC Driver not found", e);
-        }
+
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
