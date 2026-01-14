@@ -19,7 +19,7 @@ public class PlaylistRepoTest extends RepoTest {
         Playlist playlist = playlistRepo.createPlaylist("Playlist");
 
         // When
-        boolean playlistExists = playlistRepo.existsByUniqueId(playlist.getPlaylistId());
+        boolean playlistExists = playlistRepo.existsByUniqueId(playlist.getId());
 
         // Then
         assertThat(playlistExists).isTrue();
@@ -60,8 +60,8 @@ public class PlaylistRepoTest extends RepoTest {
         Playlist playlist = playlistRepo.createPlaylist("Playlist");
 
         // Then
-        assertThat(playlist.getPlaylistId()).isNotNull();
-        assertThat(playlistRepo.existsByUniqueId(playlist.getPlaylistId())).isTrue();
+        assertThat(playlist.getId()).isNotNull();
+        assertThat(playlistRepo.existsByUniqueId(playlist.getId())).isTrue();
     }
 
     @Test
@@ -74,7 +74,7 @@ public class PlaylistRepoTest extends RepoTest {
         playlistRepo.renamePlaylist(playlist, "NewPlaylist");
 
         // Then
-        Playlist reloaded = playlistRepo.findById(playlist.getPlaylistId());
+        Playlist reloaded = playlistRepo.findById(playlist.getId());
         assertThat(reloaded.getName()).isEqualTo("NewPlaylist");
     }
 
@@ -88,7 +88,7 @@ public class PlaylistRepoTest extends RepoTest {
         playlistRepo.deletePlaylist(playlist);
 
         // Then
-        assertThat(playlistRepo.existsByUniqueId(playlist.getPlaylistId())).isFalse();
+        assertThat(playlistRepo.existsByUniqueId(playlist.getId())).isFalse();
     }
 
     @Test
@@ -101,7 +101,7 @@ public class PlaylistRepoTest extends RepoTest {
         playlistRepo.addSong(playlist, testSong1);
 
         // Then
-        Playlist reloaded = playlistRepo.findById(playlist.getPlaylistId());
+        Playlist reloaded = playlistRepo.findById(playlist.getId());
 
         assertThat(reloaded.getSongs())
             .hasSize(1)
@@ -119,7 +119,7 @@ public class PlaylistRepoTest extends RepoTest {
         playlistRepo.addSongs(playlist, testSongs);
 
         // Then
-        Playlist reloaded = playlistRepo.findById(playlist.getPlaylistId());
+        Playlist reloaded = playlistRepo.findById(playlist.getId());
 
         assertThat(reloaded.getSongs())
             .hasSize(3)
@@ -137,7 +137,7 @@ public class PlaylistRepoTest extends RepoTest {
         playlistRepo.removeSong(playlist, testSong1);
 
         // Then
-        Playlist reloaded = playlistRepo.findById(playlist.getPlaylistId());
+        Playlist reloaded = playlistRepo.findById(playlist.getId());
 
         assertThat(reloaded.getSongs()).isEmpty();
     }
