@@ -1,7 +1,7 @@
 <Configuration status="WARN">
     <Appenders>
         <JDBC name="DBAppender" tableName="app_logs">
-            <ConnectionFactory class="org.example.logging.LoggingConnectionFactory" method="getConnection" />
+            <ConnectionFactory class="org.example.logging.LoggingConnection" method="getConnection" />
 
             <Column name="level" pattern="%level"/>
             <Column name="message" pattern="%message"/>

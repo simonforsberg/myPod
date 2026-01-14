@@ -106,6 +106,11 @@
             <artifactId>log4j-jdbc-dbcp2</artifactId>
             <version>2.25.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>7.0.2</version>
+        </dependency>
     </dependencies>
 
     <build>
