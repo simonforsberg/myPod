@@ -53,7 +53,6 @@ import java.util.List;
 public class MyPod extends Application {
 
 
-
     private String currentScreenName = "";
     private Playlist currentActivePlaylist = null;
 
