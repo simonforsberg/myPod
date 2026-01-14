@@ -775,7 +775,7 @@ public class MyPod extends Application {
 
             mediaPlayer.play();
         } catch (Exception e) {
-            logger.error("playReview: Could not play preview:", e);
+            logger.error("playPreview: Could not play preview:", e);
         }
     }
 
