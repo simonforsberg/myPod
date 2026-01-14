@@ -1,6 +1,8 @@
 package org.example;
 
 import jakarta.persistence.EntityManagerFactory;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
 import javafx.application.Platform;
@@ -82,6 +84,8 @@ public class MyPod extends Application {
 
     private MediaPlayer mediaPlayer;
     private ProgressBar progressBar;
+    private ProgressBar volumeBar;
+    private PauseTransition volumeHideTimer;
 
     @Override
     public void start(Stage primaryStage) {
@@ -159,7 +163,7 @@ public class MyPod extends Application {
         screenContainer.getStyleClass().add("ipod-screen");
 
         double width = 260;
-        double height = 180;
+        double height = 195;
         screenContainer.setPrefSize(width, height);
         screenContainer.setMaxSize(width, height);
 
@@ -225,6 +229,17 @@ public class MyPod extends Application {
      */
     private void setupNavigation(Scene scene) {
         scene.setOnKeyPressed(event -> {
+            if ("NowPlaying".equals(currentScreenName)) {
+                if (event.getCode() == KeyCode.UP) {
+                    adjustVolume(0.05);
+                    return;
+                }
+                if (event.getCode() == KeyCode.DOWN) {
+                    adjustVolume(-0.05);
+                    return;
+                }
+            }
+
             if (event.getCode() == KeyCode.ESCAPE) {
 
                 if ("NowPlaying".equals(currentScreenName)) {
@@ -276,6 +291,35 @@ public class MyPod extends Application {
                 updateMenu();
             }
         });
+    }
+
+    private void adjustVolume(double delta) {
+        if (mediaPlayer == null) return;
+
+        double newVolume = Math.max(0, Math.min(1, mediaPlayer.getVolume() + delta));
+        mediaPlayer.setVolume(newVolume);
+
+        volumeBar.setProgress(newVolume);
+        showVolumeOverlay();
+    }
+
+    private void showVolumeOverlay() {
+        if (volumeHideTimer != null) {
+            volumeHideTimer.stop();
+        }
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(150), volumeBar);
+        fadeIn.setToValue(1.0);
+        fadeIn.play();
+
+        volumeHideTimer = new PauseTransition(Duration.seconds(1.5));
+        volumeHideTimer.setOnFinished(e -> {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(300), volumeBar);
+            fadeOut.setToValue(0.0);
+            fadeOut.play();
+        });
+        volumeHideTimer.play();
+
     }
 
     /**
@@ -600,8 +644,8 @@ public class MyPod extends Application {
             }
         }
 
-        albumArtView.setFitWidth(60);
-        albumArtView.setFitHeight(60);
+        albumArtView.setFitWidth(70);
+        albumArtView.setFitHeight(70);
         albumArtView.setPreserveRatio(true);
         albumArtView.setSmooth(true);
         albumArtView.setStyle("""
@@ -641,7 +685,21 @@ public class MyPod extends Application {
         layout.getChildren().addAll(header, albumArtView, titleLabel, artistLabel, albumLabel, progressBar);
 
         layout.setAlignment(Pos.CENTER);
-        screenContent.getChildren().add(layout);
+
+        // --- Volume overlay ---
+        volumeBar = new ProgressBar(mediaPlayer != null ? mediaPlayer.getVolume() : 0.5);
+        volumeBar.getStyleClass().add("ipod-volume-bar");
+        volumeBar.setOpacity(0); // start hidden
+        volumeBar.setPrefWidth(220);
+
+        StackPane volumeOverlay = new StackPane(volumeBar);
+        volumeOverlay.setMouseTransparent(true);
+        StackPane.setAlignment(volumeOverlay, Pos.BOTTOM_CENTER);
+        StackPane.setMargin(volumeOverlay, new Insets(0, 0, 18, 0));
+
+
+        StackPane nowPlayingStack = new StackPane(layout, volumeOverlay);
+        screenContent.getChildren().add(nowPlayingStack);
 
 
         if (currentSong != null) {
