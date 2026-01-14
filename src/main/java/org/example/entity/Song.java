@@ -32,7 +32,7 @@ public class Song implements DBObject {
     protected Song() {
     }
 
-    public Song(Long songId, String title, Long length, String previewUrl,Album album) {
+    public Song(Long songId, String title, Long length, String previewUrl, Album album) {
         this.id = songId;
         this.name = title;
         this.length = length;

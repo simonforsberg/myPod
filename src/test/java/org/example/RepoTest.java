@@ -43,7 +43,7 @@ public class RepoTest {
         TestPersistenceManager.close();
     }
 
-    void initTestObjects(){
+    void initTestObjects() {
         artistRepo = new ArtistRepositoryImpl(TestPersistenceManager.get());
         albumRepo = new AlbumRepositoryImpl(TestPersistenceManager.get());
         songRepo = new SongRepositoryImpl(TestPersistenceManager.get());

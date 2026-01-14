@@ -5,7 +5,9 @@ import org.example.ItunesDTO;
 import org.hibernate.proxy.HibernateProxy;
 
 import javax.imageio.ImageIO;
+
 import javafx.scene.image.Image;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -63,7 +65,7 @@ public class Album implements DBObject {
         byte[] cover = generateAlbumCover(dto.artworkUrl100());
         //todo do this async?
 
-        return new Album(dto.collectionId(), dto.collectionName(), dto.primaryGenreName(), dto.releaseYear(), dto.trackCount(), cover,artist);
+        return new Album(dto.collectionId(), dto.collectionName(), dto.primaryGenreName(), dto.releaseYear(), dto.trackCount(), cover, artist);
     }
 
     public Long getId() {
@@ -144,13 +146,14 @@ public class Album implements DBObject {
 
     /**
      * generate and returns byte array with cover art
+     *
      * @param url url pointing to desired cover
      * @return a byte array of the desired cover, or null if the URL image cannot be loaded
      */
-    public static byte[] generateAlbumCover(URL url){
+    public static byte[] generateAlbumCover(URL url) {
         BufferedImage bi = loadUrlImage(url);
 
-        if (bi != null ) {
+        if (bi != null) {
             return imageToBytes(bi);
         }
         return null;
@@ -158,16 +161,17 @@ public class Album implements DBObject {
 
     /**
      * converts image to byte array to be stored as BLOB
+     *
      * @param bi buffered jpg image
      * @return image converted to byte array
      */
-    public static byte[] imageToBytes(BufferedImage bi){
+    public static byte[] imageToBytes(BufferedImage bi) {
         if (bi == null) return null;
 
-        try (ByteArrayOutputStream stream = new ByteArrayOutputStream()){
+        try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
             ImageIO.write(bi, "jpg", stream); //should always be jpg for this application
             return stream.toByteArray();
-        } catch(IOException e) {
+        } catch (IOException e) {
             System.err.println(e);
             return null;
         }
@@ -178,8 +182,8 @@ public class Album implements DBObject {
      * @param url url pointing to desired cover
      * @return bufferedImage of desired cover or null if not available
      */
-    public static BufferedImage loadUrlImage(URL url){
-        if(url == null) return null;
+    public static BufferedImage loadUrlImage(URL url) {
+        if (url == null) return null;
 
         BufferedImage bi;
         try {

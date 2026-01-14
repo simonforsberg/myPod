@@ -1,13 +1,7 @@
 package org.example;
 
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceConfiguration;
-import org.hibernate.jpa.HibernatePersistenceConfiguration;
 
-import java.util.List;
 import java.util.Map;
 
 public class PersistenceManager {
@@ -30,4 +24,4 @@ public class PersistenceManager {
     public static EntityManagerFactory getEntityManagerFactory() {
         return emf;
     }
-    }
+}

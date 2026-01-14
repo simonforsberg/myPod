@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 import org.example.entity.Playlist;
 import org.example.entity.Song;
 import org.example.repo.PlaylistRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -23,15 +25,18 @@ import java.util.List;
  */
 public class ItunesPlayList {
 
+    private static final Logger logger = LoggerFactory.getLogger(ItunesPlayList.class);
+
     private final PlaylistRepository pri;
 
     private Runnable onUpdateCallback;
+
     public void setOnUpdate(Runnable callback) {
         this.onUpdateCallback = callback;
     }
 
     private void refresh() {
-        if(onUpdateCallback != null) {
+        if (onUpdateCallback != null) {
             onUpdateCallback.run();
         }
     }
@@ -43,19 +48,19 @@ public class ItunesPlayList {
     // --- DATAMODELL ---
 
     // En lista med alla playlist som finns i databasen
-    private ObservableList<Playlist> allPlaylistList = FXCollections.observableArrayList();
+    private final ObservableList<Playlist> allPlaylistList = FXCollections.observableArrayList();
 
     // --- GUI KOMPONENTER ---
 
     // Tabellen i mitten som visar låtarna
-    private TableView<Song> songTable = new TableView<>();
+    private final TableView<Song> songTable = new TableView<>();
 
     // Listan till vänster där man väljer spellista
-    private ListView<Playlist> sourceList = new ListView<>();
+    private final ListView<Playlist> sourceList = new ListView<>();
 
     // Textfält för den "digitala displayen" högst upp
-    private Text lcdTitle = new Text("myTunes");
-    private Text lcdArtist = new Text("Välj bibliotek eller spellista");
+    private final Text lcdTitle = new Text("myTunes");
+    private final Text lcdArtist = new Text("Välj bibliotek eller spellista");
 
     /**
      * Bygger upp hela gränssnittet och visar fönstret.
@@ -339,6 +344,7 @@ public class ItunesPlayList {
                                     pl.getSongs().add(selectedSong);
                                 }
                             } catch (IllegalStateException ex) {
+                                logger.error("setupTable: add song failed", ex);
                                 new Alert(Alert.AlertType.ERROR, "Kunde inte lägga till låten: " + ex.getMessage()).showAndWait();
                             }
                         });
@@ -446,6 +452,7 @@ public class ItunesPlayList {
                     sel.setName(newName);
                     sourceList.refresh();
                 } catch (IllegalStateException ex) {
+                    logger.error("renameSelectedPlaylist: failed to rename", ex);
                     new Alert(Alert.AlertType.ERROR, "Kunde inte byta namn: " + ex.getMessage()).showAndWait();
                 }
             }
@@ -503,6 +510,7 @@ public class ItunesPlayList {
                         pl.getSongs().add(sel);
                         refresh();
                     } catch (IllegalStateException ex) {
+                        logger.error("addSelectedSong: failed to add song", ex);
                         new Alert(Alert.AlertType.ERROR, "Could not add song: " + ex.getMessage()).showAndWait();
                     }
                 }

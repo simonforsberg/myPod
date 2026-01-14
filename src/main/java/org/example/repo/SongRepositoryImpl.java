@@ -4,11 +4,15 @@ import jakarta.persistence.EntityManagerFactory;
 import org.example.entity.Album;
 import org.example.entity.Artist;
 import org.example.entity.Song;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SongRepositoryImpl implements SongRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(SongRepositoryImpl.class);
 
     private final EntityManagerFactory emf;
 
@@ -47,7 +51,10 @@ public class SongRepositoryImpl implements SongRepository {
 
     @Override
     public List<Song> findByArtist(Artist artist) {
-        if (artist == null) return new ArrayList<>();
+        if (artist == null) {
+            logger.info("findByArtist: artist is null");
+            return new ArrayList<>();
+        }
 
         return emf.callInTransaction(em ->
             em.createQuery(
@@ -66,7 +73,10 @@ public class SongRepositoryImpl implements SongRepository {
 
     @Override
     public List<Song> findByAlbum(Album album) {
-        if (album == null) return new ArrayList<>();
+        if (album == null) {
+            logger.info("findByAlbum: album is null");
+            return new ArrayList<>();
+        }
 
         return emf.callInTransaction(em ->
             em.createQuery(
@@ -85,7 +95,10 @@ public class SongRepositoryImpl implements SongRepository {
 
     @Override
     public List<Song> findByGenre(String genre) {
-        if (genre == null || genre.isBlank()) return new ArrayList<>();
+        if (genre == null || genre.isBlank()) {
+            logger.info("findByGenre: genre is null or blank");
+            return new ArrayList<>();
+        }
 
         return emf.callInTransaction(em ->
             em.createQuery(

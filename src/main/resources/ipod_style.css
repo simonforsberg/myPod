@@ -52,10 +52,25 @@
 }
 
 /* Positionering av texter på hjulet */
-.wheel-text-menu { -fx-translate-y: -70px; -fx-font-size: 10pt; }
-.wheel-text-play { -fx-translate-y: 70px; -fx-font-size: 10pt; }
-#ff-button       { -fx-translate-x: 70px; -fx-font-size: 12pt; }
-#rew-button      { -fx-translate-x: -70px; -fx-font-size: 12pt; }
+.wheel-text-menu {
+    -fx-translate-y: -70px;
+    -fx-font-size: 10pt;
+}
+
+.wheel-text-play {
+    -fx-translate-y: 70px;
+    -fx-font-size: 10pt;
+}
+
+#ff-button {
+    -fx-translate-x: 70px;
+    -fx-font-size: 12pt;
+}
+
+#rew-button {
+    -fx-translate-x: -70px;
+    -fx-font-size: 12pt;
+}
 
 
 .top-panel {
@@ -111,13 +126,21 @@
     -fx-arc-height: 10;
 }
 
-.lcd-title { -fx-font-family: "Lucida Console"; -fx-font-weight: bold; }
-.lcd-artist { -fx-fill: darkslategray; -fx-font-family: "Lucida Console"; }
+.lcd-title {
+    -fx-font-family: "Lucida Console";
+    -fx-font-weight: bold;
+}
+
+.lcd-artist {
+    -fx-fill: darkslategray;
+    -fx-font-family: "Lucida Console";
+}
 
 /* iTunes Tabell och lista */
 .source-list, .song-table {
     -fx-font-family: "Lucida Console";
 }
+
 .source-list {
     -fx-background-color: #ebf1f7;
     -fx-control-inner-background: #ebf1f7;
@@ -172,36 +195,29 @@
     -fx-background-radius: 4;
     -fx-background-insets: 0;
 
-    -fx-background-color:
-        /* SUPER highlight */
-        linear-gradient(
-            to bottom,
-            rgba(255,255,255,0.95) 0%,
-            rgba(255,255,255,0.7) 20%,
-            rgba(255,255,255,0.35) 45%,
-            rgba(255,255,255,0.15) 60%,
-            rgba(255,255,255,0.0) 100%
-        ),
-
-            /* Blå glas-kropp */
-        linear-gradient(
-            to bottom,
-            #b6ecff 0%,
-            #6bc6ff 35%,
-            #2f8ddf 65%,
-            #1b5fa7 100%
-        ),
-
-            /* Mörk botten för djup */
-        linear-gradient(
-            to bottom,
-            rgba(0,0,0,0.15),
-            rgba(0,0,0,0.45)
-        );
+    -fx-background-color: /* SUPER highlight */ linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.7) 20%,
+        rgba(255, 255, 255, 0.35) 45%,
+        rgba(255, 255, 255, 0.15) 60%,
+        rgba(255, 255, 255, 0.0) 100%
+    ),
+        /* Blå glas-kropp */ linear-gradient(
+        to bottom,
+        #b6ecff 0%,
+        #6bc6ff 35%,
+        #2f8ddf 65%,
+        #1b5fa7 100%
+    ),
+        /* Mörk botten för djup */ linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.45)
+    );
 
     /* GLAS + DJUP */
-    -fx-effect:
-        innershadow(gaussian, rgba(255,255,255,0.55), 2.5, 0, 0, 1),
-        innershadow(gaussian, rgba(0,0,0,0.45), 2.5, 0, 0, -1),
-        dropshadow(gaussian, rgba(0,0,0,0.35), 1.5, 0.0, 0, 1);
+    -fx-effect: innershadow(gaussian, rgba(255, 255, 255, 0.55), 2.5, 0, 0, 1),
+    innershadow(gaussian, rgba(0, 0, 0, 0.45), 2.5, 0, 0, -1),
+    dropshadow(gaussian, rgba(0, 0, 0, 0.35), 1.5, 0.0, 0, 1);
 }

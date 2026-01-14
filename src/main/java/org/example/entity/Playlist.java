@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-public class Playlist implements DBObject{
+public class Playlist implements DBObject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,9 +17,10 @@ public class Playlist implements DBObject{
     private String name;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
-    private Set<Song> songs = new HashSet<>();
+    private final Set<Song> songs = new HashSet<>();
 
-    protected Playlist() {}
+    protected Playlist() {
+    }
 
     public Playlist(String name) {
         this.name = name;
@@ -41,7 +42,9 @@ public class Playlist implements DBObject{
         return name;
     }
 
-    public Set<Song> getSongs() {return songs;}
+    public Set<Song> getSongs() {
+        return songs;
+    }
 
     public void setId(Long playlistId) {
         this.id = playlistId;

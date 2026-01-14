@@ -5,10 +5,14 @@ import org.example.entity.Artist;
 import org.example.entity.Playlist;
 import org.example.entity.Song;
 import org.example.repo.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class DatabaseInitializer {
+
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
 
     private final ItunesApiClient apiClient;
 
@@ -59,6 +63,7 @@ public class DatabaseInitializer {
                         }
                     });
                 } catch (Exception e) {
+                    logger.error("init: search or persist failed for term: {}", term, e);
                     throw new RuntimeException("Failed to fetch or persist data for search term: " + term, e);
                 }
             }
