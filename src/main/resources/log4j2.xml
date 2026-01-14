@@ -1,7 +1,8 @@
 <Configuration status="WARN">
     <Appenders>
-        <JDBC name="HibernateDBAppender" tableName="app_logs">
-            <ConnectionSource class="org.example.logging.JpaHibernateConnectionSource"/>
+        <JDBC name="DBAppender" tableName="app_logs">
+            <ConnectionFactory class="org.example.logging.LoggingConnectionFactory" method="getConnection" />
+
             <Column name="level" pattern="%level"/>
             <Column name="message" pattern="%message"/>
             <Column name="error_details" pattern="%throwable"/>
@@ -13,7 +14,7 @@
     </Appenders>
     <Loggers>
         <Root level="error">
-            <AppenderRef ref="HibernateDBAppender"/>
+            <AppenderRef ref="DBAppender"/>
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
