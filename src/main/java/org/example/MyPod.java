@@ -360,6 +360,7 @@ public class MyPod extends Application {
      */
     private void adjustVolume(double delta) {
         if (mediaPlayer == null) return;
+        ensureVolumeBarExists();
 
         double newVolume = Math.max(0, Math.min(1, mediaPlayer.getVolume() + delta));
         mediaPlayer.setVolume(newVolume);

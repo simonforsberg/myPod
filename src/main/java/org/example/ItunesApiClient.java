@@ -71,7 +71,7 @@ public class ItunesApiClient {
         // Validate HTTP response
         if (response.statusCode() != 200) {
             logger.error("searchSongs: status code {}", response.statusCode());
-            throw new RuntimeException("API-fel: " + response.statusCode());
+            throw new RuntimeException("API error: " + response.statusCode());
         }
 
         // Parse JSON response
