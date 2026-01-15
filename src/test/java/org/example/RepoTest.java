@@ -14,6 +14,16 @@ import org.junit.jupiter.api.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Base test class for repository integration tests.
+ *
+ * <p>This class provides a shared test setup for all repository test cases.
+ * It initializes an in-memory (or test-specific) persistence context and
+ * populates it with a consistent set of test entities.</p>
+ *
+ * <p>Concrete repository test classes should extend this class in order
+ * to reuse the same test data and repository instances.</p>
+ */
 public class RepoTest {
     protected AlbumRepositoryImpl albumRepo;
     protected ArtistRepositoryImpl artistRepo;
@@ -32,16 +42,31 @@ public class RepoTest {
     protected Song testSong4;
     protected Song testSong5;
 
+    /**
+     * Initializes repositories and persists test entities before each test.
+     *
+     * <p>This ensures that every test is executed against a fresh and
+     * predictable database state.</p>
+     */
     @BeforeEach
     void setup() {
         initTestObjects();
     }
 
+    /**
+     * Cleans up persistence resources after each test execution.
+     */
     @AfterEach
     void tearDown() {
         TestPersistenceManager.close();
     }
 
+    /**
+     * Creates and persists a fixed set of test entities.
+     *
+     * <p>The dataset includes multiple artists, albums, and songs
+     * to support repository queries, filtering, and relationship testing.</p>
+     */
     void initTestObjects() {
         artistRepo = new ArtistRepositoryImpl(TestPersistenceManager.get());
         albumRepo = new AlbumRepositoryImpl(TestPersistenceManager.get());

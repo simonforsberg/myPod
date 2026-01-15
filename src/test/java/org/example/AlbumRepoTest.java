@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.entity.Album;
 import org.example.entity.Artist;
+import org.example.repo.AlbumRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +10,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Integration tests for {@link AlbumRepositoryImpl}.
+ */
 @DisplayName("Album Repository Tests")
 public class AlbumRepoTest extends RepoTest {
 
