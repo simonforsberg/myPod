@@ -116,25 +116,6 @@ public class PlaylistRepositoryImpl implements PlaylistRepository {
     }
 
     /**
-     * Retrieves all songs contained in the given playlist.
-     *
-     * @param playlist the playlist whose songs should be retrieved
-     * @return a set of songs belonging to the playlist
-     * @throws IllegalArgumentException if {@code playlist} is {@code null}
-     */
-    @Override
-    public Set<Song> findSongsInPlaylist(Playlist playlist) {
-        if (playlist == null) {
-            logger.error("findSongsInPlaylist: playlist is null");
-            throw new IllegalArgumentException("playlist cannot be null");
-        }
-        return emf.callInTransaction(em -> {
-            Playlist managed = em.merge(playlist);
-            return managed.getSongs();
-        });
-    }
-
-    /**
      * Checks whether a given song is part of a specific playlist.
      *
      * @param playlist the playlist to check
