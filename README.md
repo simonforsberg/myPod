@@ -1,4 +1,4 @@
-# 🎵 myPod
+# 🎵 myPod 
 
 A retro iPod-inspired music player built with **JavaFX**, **JPA/Hibernate**, and the **iTunes Search API**. Browse artists, albums, and songs through a nostalgic click-wheel interface, manage playlists, and preview tracks — all backed by a MySQL database.
 
@@ -71,7 +71,7 @@ org.example
 | Album → Song | One-to-Many |
 | Playlist ↔ Song | Many-to-Many |
 
-## 📋 Prerequisites
+## 📋 Requirements
 
 - **Java 25** (or compatible JDK)
 - **Maven 3.9+**
