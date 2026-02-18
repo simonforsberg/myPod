@@ -48,6 +48,21 @@ org.example
 └── EntityManagerFactoryProvider   # EMF configuration & creation
 ```
 
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| **Java 25** | Language & runtime |
+| **JavaFX 25** | Graphical user interface |
+| **Hibernate 7.2** | ORM / JPA provider |
+| **MySQL 9.5** | Production database |
+| **H2** | In-memory test database |
+| **Jackson** | JSON parsing (iTunes API) |
+| **HikariCP** | Connection pooling |
+| **Log4j 2** | Logging framework |
+| **JUnit 6 / AssertJ / Mockito** | Testing |
+| **Docker Compose** | Database container orchestration |
+
 ### Data Model
 
 | Relationship | Type |
@@ -66,8 +81,8 @@ org.example
 
 ### 1. Start the database
 
-```shell
-bash docker compose up -d
+```bash
+docker compose up -d
 ```
 
 This launches a MySQL 9.5 container with:
@@ -77,8 +92,8 @@ This launches a MySQL 9.5 container with:
 
 ### 2. Build and run
 
-```shell
-bash mvn clean javafx:run
+```bash
+mvn clean javafx:run
 ```
 
 On first launch, the app will:
@@ -98,8 +113,8 @@ On first launch, the app will:
 
 Tests use an **H2 in-memory database** so no external services are needed:
 
-```shell
-bash mvn test
+```bash
+mvn test
 ```
 
 Test suites cover the repository layer for all core entities:
@@ -107,18 +122,3 @@ Test suites cover the repository layer for all core entities:
 - `ArtistRepoTest`
 - `AlbumRepoTest`
 - `PlaylistRepoTest`
-
-## 🛠️ Tech Stack
-
-| Technology | Purpose |
-|---|---|
-| **Java 25** | Language & runtime |
-| **JavaFX 25** | Graphical user interface |
-| **Hibernate 7.2** | ORM / JPA provider |
-| **MySQL 9.5** | Production database |
-| **H2** | In-memory test database |
-| **Jackson** | JSON parsing (iTunes API) |
-| **HikariCP** | Connection pooling |
-| **Log4j 2** | Logging framework |
-| **JUnit 6 / AssertJ / Mockito** | Testing |
-| **Docker Compose** | Database container orchestration |
